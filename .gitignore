@@ -1,0 +1,7 @@
+.directory
+__pycache__
+groupme.key
+youtube_api.key
+*.json
+*.out
+local.sh
