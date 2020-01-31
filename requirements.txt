@@ -1,1 +1,2 @@
-GroupyAPI
+GroupyAPI==0.10.3
+atomicwrites==1.3.0
