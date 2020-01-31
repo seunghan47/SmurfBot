@@ -25,14 +25,20 @@ except KeyError:
     except FileNotFoundError:
         yt_key = None
 
+
 try:
-    with open(os.path.abspath(bot_path + '/../groups.txt'), 'r') as bot_groups:
-        for b in bot_groups.readlines():
-            if b.strip()[:2] != "//":
-                groups.append(b.strip())
-except FileNotFoundError:
-    print("Couldn't find  groups.txt. Make sure it is in the root of this directory")
-    sys.exit(1)
+    groups = os.environ['GROUPME_GROUPS'].split(" ")
+    if len(groups) == 1:
+        groups = groups[0].split(",")
+except KeyError:
+    try:
+        with open(os.path.abspath(bot_path + '/../groups.txt'), 'r') as bot_groups:
+            for b in bot_groups.readlines():
+                if b.strip()[:2] != "//":
+                    groups.append(b.strip())
+    except FileNotFoundError:
+        print("Couldn't find  groups.txt. Make sure it is in the root of this directory")
+        sys.exit(1)
 
 
 def consume(bot, s=1):
