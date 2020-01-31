@@ -30,6 +30,8 @@ try:
     groups = os.environ['GROUPME_GROUPS'].split(" ")
     if len(groups) == 1:
         groups = groups[0].split(",")
+    groups = list(filter(lambda x: x.strip() != "", groups))
+    groups = list(map(lambda x: x.strip(), groups))
 except KeyError:
     try:
         with open(os.path.abspath(bot_path + '/../groups.txt'), 'r') as bot_groups:
@@ -54,7 +56,7 @@ client = Client.from_token(chat_key)
 
 for g in groups:
     try:
-        g = list(filter(lambda x: x.name == g, client.groups.list()))[0].strip()
+        g = list(filter(lambda x: x.name == g, client.groups.list()))[0]
         b = Bot(g, yt_key=yt_key)
         print("creating thread for {}".format(g.name))
         threading.Thread(target=consume, name=g.name, daemon=True, args=(b, .1)).start()
