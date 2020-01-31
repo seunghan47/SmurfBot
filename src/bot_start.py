@@ -59,7 +59,8 @@ def shutdown_bot(signal, frame):
     for thread in threading.enumerate():
         if isinstance(thread, threading.Thread) and thread.name != "MainThread":
             thread.do_run = False
-    sys.exit(0)
+        if isinstance(thread, threading.Timer):
+            thread.cancel()
 
 
 signal.signal(signal.SIGINT, shutdown_bot)
