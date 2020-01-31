@@ -5,3 +5,4 @@ youtube_api.key
 *.json
 *.out
 local.sh
+groups.txt
