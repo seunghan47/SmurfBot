@@ -1,20 +1,20 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 BOT_DIR=$DIR"/../src"
 LOG_DIR=$DIR"/../logs"
 
 function start(){
-	if  pgrep -fv "bot_start.py" > /dev/null; then
-		nohup python3 "$BOT_DIR"/bot_start.py >> "$LOG_DIR/logs.out" &
+	if  pgrep -fv "start.py" > /dev/null; then
+		nohup python3 "$BOT_DIR"/start.py >> "$LOG_DIR/logs.out" &
 		echo "bot has been started"
 	fi
 }
 
 function stop(){
-	if  pgrep -f "bot_start.py" > /dev/null; then
+	if  pgrep -f "start.py" > /dev/null; then
 		echo "bot is up. killing bot"
-		pkill -f bot_start.py
+		pkill -f start.py
 	else
 		echo "bot isn't up. nothing to kill"
 	fi
@@ -34,5 +34,4 @@ case $1 in
 		;;
 	*)
 		echo "invalid option. Options are start, stop, or restart"
-
 esac

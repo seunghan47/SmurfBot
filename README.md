@@ -14,7 +14,7 @@ Before the bot can listen to a group, it needs to be added to that group. Do tha
 
 There are multiple ways to run the bot.
 
-1. python3 bot_start.py
+1. python3 start.py
 2. scripts/bot.sh start|stop|restart (This one will run it as a background process)
 3. Docker
 

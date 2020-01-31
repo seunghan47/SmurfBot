@@ -10,4 +10,4 @@ RUN mkdir app/creds/
 RUN mkdir app/logs/
 RUN mkdir app/tags/
 COPY src/* app/src/
-CMD ["python","app/src/bot_start.py"]
+CMD ["python","app/src/start.py"]
