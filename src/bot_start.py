@@ -36,22 +36,29 @@ client = Client.from_token(chat_key)
 
 
 def consume(bot, s=1):
-    message = bot.get_message()
-    bot.process_message(message)
-    sleep(s)
+    thread = threading.currentThread()
+    while getattr(thread, "do_run", True):
+        bot.process_message(bot.get_message())
+        sleep(s)
+    else:
+        print("Stopping {} thread".format(thread.name))
 
 
 for g in groups:
     try:
         g = list(filter(lambda x: x.name == g.strip(), client.groups.list()))[0]
         b = Bot(g, yt_key=yt_key)
-        threading.Thread(target=consume, daemon=True, args=(b, .1)).start()
+        threading.Thread(target=consume, name=g.name, daemon=True, args=(b, .1)).start()
     except IndexError:
         print("'{}' group doesn't exist".format(g))
 
 
 def shutdown_bot(signal, frame):
     print("Shutting down the bot")
+    print(threading.enumerate())
+    for thread in threading.enumerate():
+        if isinstance(thread, threading.Thread) and thread.name != "MainThread":
+            thread.do_run = False
     sys.exit(0)
 
 
