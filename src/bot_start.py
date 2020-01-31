@@ -27,12 +27,12 @@ except KeyError:
 
 try:
     with open(os.path.abspath(bot_path + '/../groups.txt'), 'r') as bot_groups:
-        groups = bot_groups.readlines()
+        for b in bot_groups.readlines():
+            if b.strip()[:2] != "//":
+                groups.append(b.strip())
 except FileNotFoundError:
     print("Couldn't find  groups.txt. Make sure it is in the root of this directory")
     sys.exit(1)
-
-client = Client.from_token(chat_key)
 
 
 def consume(bot, s=1):
@@ -44,10 +44,13 @@ def consume(bot, s=1):
         print("Stopping {} thread".format(thread.name))
 
 
+client = Client.from_token(chat_key)
+
 for g in groups:
     try:
-        g = list(filter(lambda x: x.name == g.strip(), client.groups.list()))[0]
+        g = list(filter(lambda x: x.name == g, client.groups.list()))[0]
         b = Bot(g, yt_key=yt_key)
+        print("creating thread for {}".format(g.name))
         threading.Thread(target=consume, name=g.name, daemon=True, args=(b, .1)).start()
     except IndexError:
         print("'{}' group doesn't exist".format(g))
@@ -55,7 +58,6 @@ for g in groups:
 
 def shutdown_bot(signal, frame):
     print("Shutting down the bot")
-    print(threading.enumerate())
     for thread in threading.enumerate():
         if isinstance(thread, threading.Thread) and thread.name != "MainThread":
             thread.do_run = False
