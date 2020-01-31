@@ -54,7 +54,7 @@ client = Client.from_token(chat_key)
 
 for g in groups:
     try:
-        g = list(filter(lambda x: x.name == g, client.groups.list()))[0]
+        g = list(filter(lambda x: x.name == g, client.groups.list()))[0].strip()
         b = Bot(g, yt_key=yt_key)
         print("creating thread for {}".format(g.name))
         threading.Thread(target=consume, name=g.name, daemon=True, args=(b, .1)).start()

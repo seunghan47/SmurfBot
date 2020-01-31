@@ -30,7 +30,10 @@ The bot looks for Credentials in two places. It will look for the environmental 
 2. creds/groupme.key: a text file with the token in the first line
 
 ## Groups
-The bot will look for `groups.txt` in the root of the directory. This is just a file with what groups you want the bot
+The bot will first look the `GROUPME_GROUPS` environment variable. The format of the variable can be either space 
+separated `group1 group2 group3` or commma separated `group1,group2,group3`
+
+If that isn't found, it'll look for `groups.txt` in the root of the directory. This is just a file with what groups you want the bot
 to be in separated by new lines. If you add `//` to the front of a group name, it won't listen to that group
 
 ```
