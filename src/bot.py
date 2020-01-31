@@ -16,7 +16,7 @@ class Bot:
         try:
             return self.group.messages.list()[0]
         except Exception as e:
-            print(e)
+            print("bot.get_message: {}".format(e))
             return None
 
     def reload_tags(self):
@@ -50,9 +50,9 @@ class Bot:
         if message is not None:
             try:
                 message_text = message.text.lower()
-                user_id = message.user_id
-                owner = self.find_owner_name(user_id)
                 if message_text[:len(self.delim)] == self.delim:
+                    user_id = message.user_id
+                    owner = self.find_owner_name(user_id)
                     message_text = message_text[len(self.delim):]
                     message_text = message_text.split(" ")
                     command = message_text[0]
@@ -74,4 +74,4 @@ class Bot:
                     else:
                         self.group.post(result)
             except Exception as e:
-                print(e)
+                print("bot.process_message: {}".format(e))
