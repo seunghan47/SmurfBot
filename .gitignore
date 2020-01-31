@@ -6,3 +6,4 @@ youtube_api.key
 *.out
 local.sh
 groups.txt
+*.swp
