@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 import signal
 import os
+import sys
 import threading
 from bot import Bot
 from groupy.client import Client
 from time import sleep
 
 bot_path = os.path.dirname(os.path.realpath(__file__))
+groups = []
 
 try:
     chat_key = os.environ['GROUPME_KEY']
@@ -45,7 +47,7 @@ def shutdown_bot(signal, frame):
     smurf_city_bot.save_tags()
     test_group_bot.save_tags()
     house_hunters_bot.save_tags()
-    os._exit(0)
+    sys.exit(0)
 
 
 def tag_reloader(signal, frame):
