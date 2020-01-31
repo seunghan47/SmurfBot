@@ -1,5 +1,4 @@
 import googleapiclient.discovery
-import google-api-python-client
 
 class Utilities:
     def __init__(self, yt_key=None):
