@@ -128,14 +128,10 @@ class Tags:
             return 'The tag "{}" does not exist'.format(name)
 
     def list_tags(self):
-        all_tags = []
         if len(self.tags) == 0:
             return 'No tags exist'
 
-        for tag in self.tags:
-            all_tags.append(tag['name'])
-
-        all_tags = ', '.join(all_tags)
+        all_tags = ', '.join(self.tags.keys())
 
         if len(all_tags) > 1000:
             all_tags = list(map(''.join, zip_longest(*[iter(all_tags)] * 1000, fillvalue='')))
