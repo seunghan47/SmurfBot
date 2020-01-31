@@ -34,16 +34,10 @@ for g in client.groups.list():
     if g.name == 'Couch':
         house_hunters = g
 
-
-def reload_members(group_name, groupme_key=chat_key):
-    c = Client.from_token(groupme_key)
-    return list(filter(lambda x: x.name == group_name, c.groups.list()))[0]
-
-
 # make a bot object for each group you want
-smurf_city_bot = Bot(smurf_city, yt_key=yt_key, reload_mem=reload_members)
-test_group_bot = Bot(test_group, yt_key=yt_key, reload_mem=reload_members)
-house_hunters_bot = Bot(house_hunters, yt_key=yt_key, reload_mem=reload_members)
+smurf_city_bot = Bot(smurf_city, yt_key=yt_key)
+test_group_bot = Bot(test_group, yt_key=yt_key)
+house_hunters_bot = Bot(house_hunters, yt_key=yt_key)
 
 
 def shutdown_bot(signal, frame):
@@ -61,16 +55,8 @@ def tag_reloader(signal, frame):
     house_hunters_bot.reload_tags()
 
 
-def member_reloader(signal, frame):
-    print("reloading members")
-    smurf_city_bot.reload_members()
-    test_group_bot.reload_members()
-    house_hunters_bot.reload_members()
-
-
 signal.signal(signal.SIGINT, shutdown_bot)
 signal.signal(signal.SIGQUIT, tag_reloader)
-signal.signal(signal.SIGHUP, member_reloader)
 
 print("Bot started up successfully")
 
@@ -98,6 +84,6 @@ def house_group():
 
 
 # add a threading method for each group
-threading.Thread(target=test_group).start()
-threading.Thread(target=smurf_group).start()
-threading.Thread(target=house_group).start()
+threading.Thread(target=test_group, daemon=True).start()
+threading.Thread(target=smurf_group, daemon=True).start()
+threading.Thread(target=house_group, daemon=True).start()

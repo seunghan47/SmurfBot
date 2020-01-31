@@ -1,14 +1,16 @@
 from utilities import Utilities
 from tags import Tags
+from threading import Timer, Event
 
 
 class Bot:
-    def __init__(self, group, yt_key=None, reload_mem=None, delim="$"):
+    def __init__(self, group, yt_key=None, delim="$"):
         self.group = group
+        print(self.group)
         self.delim = delim
         self.ult = Utilities(yt_key)
         self.tags = Tags(group.name, group.members)
-        self.reload_mem = reload_mem
+        Timer(600, self.reload_members).start()
 
     def get_message(self):
         try:
@@ -20,10 +22,13 @@ class Bot:
     def reload_tags(self):
         self.tags.reload_tags()
 
-    def reload_members(self):
-        members = self.reload_mem(self.group.name).members
-        print("Members of {}: {}".format(self.group.name, members))
-        self.tags.update_members(members)
+    def reload_members(self, stop=Event()):
+        self.group.refresh_from_server()
+        print("Members of {}: {}".format(self.group.name, self.group.members))
+        self.tags.update_members(self.group.members)
+
+        if not stop.is_set():
+            Timer(600, self.reload_members).start()
     
     def save_tags(self):
         self.tags.save_tags()
