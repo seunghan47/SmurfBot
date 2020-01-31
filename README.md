@@ -8,6 +8,8 @@ just a fun little side project for when I'm bored.
 [Documentation for Groupy](http://groupy.readthedocs.io/en/master/index.html)
 
 ## Instructions
+Before the bot can listen to a group, it needs to be added to that group. Do that first or the bot won't work.
+
 There are multiple ways to run the bot.
 
 1. python3 bot_start.py
@@ -25,6 +27,16 @@ The bot looks for Credentials in two places. It will look for the environmental 
 1. Environmental Variables: Looks for the environmental variable `GROUPME_KEY` and uses that value
 2. creds/groupme.key: a text file with the token in the first line
 
+## Groups
+The bot will look for `groups.txt` in the root of the directory. This is just a file with what groups you want the bot
+to be in separated by new lines. If you add `//` to the front of a group name, it won't listen to that group
+
+```
+group1
+group2
+//group3
+```
+
 
 ## Docker
 Using the provided Dockerfile, you can build an image with `docker build -t groupme-bot`.
@@ -35,7 +47,8 @@ If you don't mount a volume that contains `groupme.key` to `/app/creds`, you nee
 
 Once the image is built, you can run it with:
 
-`docker run -ditv --rm -v [local tag folder]:/app/tags -v [local creds folder]:/app/creds --name groupme groupme-bot`
+`docker run -ditv --rm -v [local tag folder]:/app/tags -v [local creds folder]:/app/creds 
+-v [local groups.txt]:/home/groupme/app/groups.txt --name groupme groupme-bot`
 
 add `-e GROUPME_KEY=[token]` if you need the token as an environmental variable
 
