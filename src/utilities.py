@@ -1,3 +1,6 @@
+import googleapiclient.discovery
+import google-api-python-client
+
 class Utilities:
     def __init__(self, yt_key=None):
         self.yt_key = yt_key
@@ -11,30 +14,17 @@ class Utilities:
         git_url = "https://github.com/nithjino/GroupMe_Bot"
         return "Here is the source code " + git_url
 
-'''
-    def yt_search(self,message):
-#from apiclient.discovery import build
-#from apiclient.errors import HttpError
-#from oauth2client.tools import argparser
-#from groupy import attachments
-        if message.lower()[:2] == "yt":
-            DEVELOPER_KEY = self.yt_key
-            YOUTUBE_API_SERVICE_NAME = "youtube"
-            YOUTUBE_API_VERSION = "v3"
+    def yt_search(self,query):
+        #https://developers.google.com/youtube/v3/quickstart/python
+        #os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
+        api_key = self.yt_key
+        api_service_name = "youtube"
+        api_version = "v3"
             
-            query = message.lower()[3:]
+        youtube = googleapiclient.discovery.build(api_service_name, api_version, developerKey=api_key)
             
-            youtube = build(YOUTUBE_API_SERVICE_NAME, YOUTUBE_API_VERSION,developerKey=DEVELOPER_KEY)
-            
-            search_response = youtube.search().list(q=query
-                                                    ,part="id,snippet"
-                                                    ,maxResults=1
-                                                    ,type='video').execute()
-            video = []
-            for search_result in search_response.get("items", []):
-                video_description= search_result['snippet']['title'] + " from " + search_result['snippet']['channelTitle']
-                video.append('http://youtu.be/' + search_result['id']['videoId'])
-                
-            self.active_group.post(video_description)
-            self.active_group.post(video[0])
-'''
+        result = youtube.search().list(q=query, part="snippet", maxResults=1,type='video').execute()['items']
+        result = result[1]['snippet']
+        title = result['title']
+        url = "http://youtu.be/{}".format(result)
+        return title + "\n" + url
