@@ -2,6 +2,7 @@ import json
 import os
 from functools import reduce
 from itertools import zip_longest
+from atomicwrites import atomic_write
 
 
 class Tags:
@@ -50,8 +51,8 @@ class Tags:
     def save_tags(self):
         tag_json = os.path.abspath(self.bot_path + "/../tags/" + self.group_name + '.json')
         print("saving: {}".format(tag_json))
-        with open(tag_json, 'w') as tag_file:
-            json.dump(self.tags, tag_file, sort_keys=True, indent=2)
+        with atomic_write(tag_json, overwrite=True) as tag_file:
+            tag_file.write(json.dumps(self.tags, sort_keys=True, indent=2))
 
     def parse_commands(self, message, owner, mentions):
         command = message[1].rstrip()
