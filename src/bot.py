@@ -65,6 +65,8 @@ class Bot:
                         result = self.find_avatar(message_text, message.attachments)
                     if command == "git":
                         result = self.ult.git()
+                    if command == "yt":
+                        result = self.ult.yt_search(message_text)
                     if command == "tag":
                         result = self.tags.parse_commands(message_text, user_id, message.attachments)
                     print("posting \"{}\" in {}".format(result, self.group.name))
