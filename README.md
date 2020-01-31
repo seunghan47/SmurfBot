@@ -4,7 +4,9 @@ just a fun little side project for when I'm bored.
 
 ## Libraries used
 [Groupy: an API wrapper for Groupme](https://github.com/rhgrant10/Groupy)
+
 [python-atomicwrites: Powerful Python library for atomic file writes](https://github.com/untitaker/python-atomicwrites)
+
 [Documentation for Groupy](http://groupy.readthedocs.io/en/master/index.html)
 
 ## Instructions
