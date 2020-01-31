@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-BOT_DIR=$DIR"/../src"
-LOG_DIR=$DIR"/../logs"
+BOT_DIR="$DIR/../src"
+LOG_DIR="$DIR/../logs"
 
 function start(){
 	if  pgrep -fv "start.py" > /dev/null; then
-		nohup python3 "$BOT_DIR"/start.py >> "$LOG_DIR/logs.out" &
+		nohup python3 "$BOT_DIR/start.py" >> "$LOG_DIR/logs.out" &
+		ps -eo pid,command | awk ' /"$BOT_DIR/start.py"/ { print $1 }' > "$DIR/bot_pid"
 		echo "bot has been started"
 	fi
 }
@@ -14,7 +15,7 @@ function start(){
 function stop(){
 	if  pgrep -f "start.py" > /dev/null; then
 		echo "bot is up. killing bot"
-		pkill -f start.py
+		kill -15 "$(cat "$DIR/bot_pid")"
 	else
 		echo "bot isn't up. nothing to kill"
 	fi
