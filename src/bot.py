@@ -58,7 +58,7 @@ class Bot:
                     command = message_text[0]
 
                     print("Processing from {}: {}".format(owner, message_text))
-
+                    result = None
                     if command == "help":
                         result = self.ult.post_help()
                     if command == "avatar":
@@ -66,10 +66,16 @@ class Bot:
                     if command == "git":
                         result = self.ult.git()
                     if command == "yt":
-                        result = self.ult.yt_search(message_text)
+                        query = ' '.join(message_text[1:])
+                        result = self.ult.yt_search(query)
                     if command == "tag":
                         result = self.tags.parse_commands(message_text, user_id, message.attachments)
+
+                    if result is None:
+                        return None
+
                     print("posting \"{}\" in {}".format(result, self.group.name))
+                    
                     if isinstance(result, list):
                         for t in result:
                             self.group.post(t)

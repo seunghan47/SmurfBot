@@ -14,16 +14,11 @@ class Utilities:
         return "Here is the source code " + git_url
 
     def yt_search(self, query):
-        #https://developers.google.com/youtube/v3/quickstart/python
-        #os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
         api_key = self.yt_key
         api_service_name = "youtube"
         api_version = "v3"
-            
         youtube = googleapiclient.discovery.build(api_service_name, api_version, developerKey=api_key)
-            
-        result = youtube.search().list(q=query, part="snippet", maxResults=1,type='video').execute()['items'][1]
-        result = result['snippet']
-        title = result['title']
-        url = "http://youtu.be/{}".format(result)
-        return title + "\n" + url
+        result = youtube.search().list(q=query, part="snippet", maxResults=1,type='video').execute()
+        video_id = result['items'][0]['id']['videoId']
+        return "http://youtu.be/{}".format(video_id)
+
