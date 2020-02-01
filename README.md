@@ -7,6 +7,8 @@ just a fun little side project for when I'm bored.
 
 [python-atomicwrites: Powerful Python library for atomic file writes](https://github.com/untitaker/python-atomicwrites)
 
+[google-api-python-client](https://developers.google.com/youtube/v3/quickstart/python) (only needed if you will be doing yt searches from the bot)
+
 [Documentation for Groupy](http://groupy.readthedocs.io/en/master/index.html)
 
 ## Instructions
@@ -24,10 +26,10 @@ You have to pick a deliminator to use this bot. The default one is `$`. You can 
 object
 
 ## Credentials
-The bot looks for Credentials in two places. It will look for the environmental variable first.
+The bot looks for Credentials in two places. It will look for the environmental variable first. Only credential that is required is the GroupMe key. The YT key is only needed if you want to do youtube searches with the bot.
 
-1. Environmental Variables: Looks for the environmental variable `GROUPME_KEY` and uses that value
-2. creds/groupme.key: a text file with the token in the first line
+1. Environmental Variables: Looks for the environmental variable `GROUPME_KEY` and `YT_KEY` and uses that value
+2. creds/groupme.key and creds/youtube_api.key: a text file with the token in the first line
 
 ## Groups
 The bot will first look the `GROUPME_GROUPS` environment variable. The format of the variable can be either space 
@@ -78,7 +80,9 @@ To attach to a detached container, follow these steps (assuming you ran it with 
 | ------------- |:-------------:| --------------------------------------:|
 | avatar        | [mention_name]         | avatar @name                  |
 | git           | none                   | git                           |
+| yt**          | [query]                | yt skateboard tricks
 
+** yt command will only post the first link from the youtube search
 
 ### Tag System
 
