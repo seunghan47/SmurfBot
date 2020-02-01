@@ -111,7 +111,10 @@ class Tags:
     def post_tag(self, name):
         print("searching for tag: {}".format(name))
         if name in self.tags:
-            return self.tags[name]['content']
+            tag = self.tags[name]['content']
+            if tag.split(" ")[0] == "$tag":
+                return self.post_tag(tag.split(" ")[1])
+            return tag
         return 'The tag "{}" does not exist'.format(name)
 
     def delete_tag(self, name, owner):
