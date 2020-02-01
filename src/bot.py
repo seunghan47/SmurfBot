@@ -6,7 +6,6 @@ from threading import Timer, Event
 class Bot:
     def __init__(self, group, yt_key=None, delim="$"):
         self.group = group
-        print(self.group)
         self.delim = delim
         self.ult = Utilities(yt_key)
         self.tags = Tags(group.name, group.members)

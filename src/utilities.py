@@ -14,10 +14,11 @@ class Utilities:
         return "Here is the source code " + git_url
 
     def yt_search(self, query):
-        api_key = self.yt_key
+        if self.yt_key is None:
+            return "need a YouTube API key"
         api_service_name = "youtube"
         api_version = "v3"
-        youtube = googleapiclient.discovery.build(api_service_name, api_version, developerKey=api_key)
+        youtube = googleapiclient.discovery.build(api_service_name, api_version, developerKey=self.yt_key)
         result = youtube.search().list(q=query, part="snippet", maxResults=1,type='video').execute()
         video_id = result['items'][0]['id']['videoId']
         return "http://youtu.be/{}".format(video_id)
