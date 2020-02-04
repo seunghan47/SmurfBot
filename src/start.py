@@ -25,24 +25,7 @@ except KeyError:
     except FileNotFoundError:
         yt_key = None
 
-'''
-try:
-    groups = os.environ['GROUPME_GROUPS'].split(" ")
-    if len(groups) == 1:
-        groups = groups[0].split(",")
-    groups = list(filter(lambda x: x.strip() != "", groups))
-    groups = list(map(lambda x: x.strip(), groups))
-except KeyError:
-    try:
-        with open(os.path.abspath(bot_path + '/../groups.txt'), 'r') as bot_groups:
-            for b in bot_groups.readlines():
-                if b.strip()[:2] != "//":
-                    groups.append(b.strip())
-    except FileNotFoundError:
-        print("Couldn't find  groups.txt. Make sure it is in the root of this directory")
-        sys.exit(1)
-'''
-
+client = Client.from_token(chat_key)
 groups = {}
 
 try:
@@ -80,12 +63,9 @@ def consume(bot, s=1):
     else:
         print("Stopping {} thread".format(thread.name))
 
-
-client = Client.from_token(chat_key)
-
-for g in groups:
+for g in groups.keys():
     try:
-        g = list(filter(lambda x: x.id == g, client.groups.list()))[0]
+        g = client.group.get(groups[g])
         b = Bot(g, yt_key=yt_key)
         print("creating thread for {}".format(g.name))
         threading.Thread(target=consume, name=g.name, daemon=True, args=(b, .1)).start()
