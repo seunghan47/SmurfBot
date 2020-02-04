@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import signal
 import os
-import sys
 import threading
 import json
 from bot import Bot
@@ -63,9 +62,10 @@ def consume(bot, s=1):
     else:
         print("Stopping {} thread".format(thread.name))
 
+
 for g in groups.keys():
     try:
-        g = client.group.get(groups[g])
+        g = client.groups.get(groups[g])
         b = Bot(g, yt_key=yt_key)
         print("creating thread for {}".format(g.name))
         threading.Thread(target=consume, name=g.name, daemon=True, args=(b, .1)).start()
