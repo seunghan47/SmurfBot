@@ -1,4 +1,8 @@
-import googleapiclient.discovery
+try:
+    import googleapiclient.discovery
+except ModuleNotFoundError:
+    pass
+
 
 class Utilities:
     def __init__(self, yt_key=None):
