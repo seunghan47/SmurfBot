@@ -3,12 +3,12 @@ import signal
 import os
 import sys
 import threading
+import json
 from bot import Bot
 from groupy.client import Client
 from time import sleep
 
 bot_path = os.path.dirname(os.path.realpath(__file__))
-groups = []
 
 try:
     chat_key = os.environ['GROUPME_KEY']
@@ -25,7 +25,7 @@ except KeyError:
     except FileNotFoundError:
         yt_key = None
 
-
+'''
 try:
     groups = os.environ['GROUPME_GROUPS'].split(" ")
     if len(groups) == 1:
@@ -41,6 +41,35 @@ except KeyError:
     except FileNotFoundError:
         print("Couldn't find  groups.txt. Make sure it is in the root of this directory")
         sys.exit(1)
+'''
+
+groups = {}
+
+try:
+    with open('groups.json') as allGroups:
+        groups = json.load(allGroups)
+except FileNotFoundError:
+    potentialGroups = []
+    for group in client.groups.list():
+        potentialGroups.append((group.id, group.name))
+
+    print("Which groups to use the bot for?")
+
+    for index, pair in enumerate(potentialGroups):
+        print("{}: {}".format(index + 1, pair[1]))
+
+    choices = input("Which ones (comma separated): ").split(",")
+    chosenGroups = {}
+    for choice in choices:
+        try:
+            chosenGroups[potentialGroups[int(choice) - 1][1]] = potentialGroups[int(choice) - 1][0]
+        except ValueError:
+            pass
+        except IndexError:
+            pass
+
+    with open('groups.json', 'w') as g:
+        json.dump(chosenGroups, g)
 
 
 def consume(bot, s=1):
@@ -56,7 +85,7 @@ client = Client.from_token(chat_key)
 
 for g in groups:
     try:
-        g = list(filter(lambda x: x.name == g, client.groups.list()))[0]
+        g = list(filter(lambda x: x.id == g, client.groups.list()))[0]
         b = Bot(g, yt_key=yt_key)
         print("creating thread for {}".format(g.name))
         threading.Thread(target=consume, name=g.name, daemon=True, args=(b, .1)).start()
