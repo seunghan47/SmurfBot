@@ -32,18 +32,21 @@ The bot looks for Credentials in two places. It will look for the environmental 
 2. creds/groupme.key and creds/youtube_api.key: a text file with the token in the first line
 
 ## Groups
-The bot will first look the `GROUPME_GROUPS` environment variable. The format of the variable can be either space 
-separated `group1 group2 group3` or commma separated `group1,group2,group3`
+On first start (assuming a groups.json doesn't exist), the bot will prompt you to select what groups to listen to.
+It will create a groups.json where the key is the group name and the value will be a dictionary with
+an `id` and `enabled` keys. If `enabled` is set to true, it will listen to that chat. `id` is the group id
+and since it will use that to find the group, the group name can change but the bot will still be able to listen
+to it. If you are running this from docker, it is best to use the docker command below but with `-it` first instead of
+`-ditv`
 
-If that isn't found, it'll look for `groups.txt` in the root of the directory. This is just a file with what groups you want the bot
-to be in separated by new lines. If you add `//` to the front of a group name, it won't listen to that group
+JSON structure of `groups.json`
 
+```json
+{
+  "group1": {"enabled": true, "id": 1000123123},
+  "group2": {"enabled": false, "id": 834234235}
+}
 ```
-group1
-group2
-//group3
-```
-
 
 ## Docker
 Using the provided Dockerfile, you can build an image with `docker build -t groupme-bot`.
@@ -55,7 +58,7 @@ If you don't mount a volume that contains `groupme.key` to `/app/creds`, you nee
 Once the image is built, you can run it with:
 
 `docker run -ditv --rm -v [local tag folder]:/app/tags -v [local creds folder]:/app/creds 
--v [local groups.txt]:/home/groupme/app/groups.txt --name groupme groupme-bot`
+-v [local groups.json]:/home/groupme/app/groups.json --name groupme groupme-bot`
 
 add `-e GROUPME_KEY=[token]` if you need the token as an environmental variable
 
