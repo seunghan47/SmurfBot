@@ -44,14 +44,15 @@ except FileNotFoundError:
     chosenGroups = {}
     for choice in choices:
         try:
-            chosenGroups[potentialGroups[int(choice) - 1][1]] = potentialGroups[int(choice) - 1][0]
+            chosenGroups[potentialGroups[int(choice) - 1][1]] = {"id":potentialGroups[int(choice) - 1][0], "enabled": True}
         except ValueError:
             pass
         except IndexError:
             pass
 
     with open('groups.json', 'w') as g:
-        json.dump(chosenGroups, g)
+        json.dump(chosenGroups, g, sort_keys=True, indent=2)
+    groups = chosenGroups
 
 
 def consume(bot, s=1):
@@ -63,12 +64,14 @@ def consume(bot, s=1):
         print("Stopping {} thread".format(thread.name))
 
 
-for g in groups.keys():
+for g in groups.values():
+    print(g)
     try:
-        g = client.groups.get(groups[g])
-        b = Bot(g, yt_key=yt_key)
-        print("creating thread for {}".format(g.name))
-        threading.Thread(target=consume, name=g.name, daemon=True, args=(b, .1)).start()
+        if g['enabled']:
+            g = client.groups.get(g['id'])
+            b = Bot(g, yt_key=yt_key)
+            print("creating thread for {}".format(g.name))
+            threading.Thread(target=consume, name=g.name, daemon=True, args=(b, .1)).start()
     except IndexError:
         print("'{}' group doesn't exist".format(g))
 
