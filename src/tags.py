@@ -183,10 +183,10 @@ class Tags:
         """
         print("searching for tag: {}".format(name))
         if name in self.tags['tags']:
-            tag = self.tags['tags'][name]['content']
-            if tag.split(" ")[0] == "$tag":
-                return self.post_tag(tag.split(" ")[1])
-            return tag
+            content = self.tags['tags'][name]['content']
+            if content.split(" ")[0] == "$tag":
+                return self.post_tag(content.split(" ")[1])
+            return content
         return 'The tag "{}" does not exist'.format(name)
 
     def delete_tag(self, name, owner):
@@ -247,14 +247,14 @@ class Tags:
         :param owner: user id of whoever invoked this command
         :return: updates the tag's name or returns a message saying you can't
         """
+        print(self.tags['tags'][old_name])
         if not self.tags['tags']:
             return "There are no tags"
         if new_name in self.tags['tags']:
             return 'The tag "{}" already exists. Can\'t change name to it'.format(new_name)
         try:
             if self.tags['tags'][old_name]['owner'] == owner:
-                self.tags['tags'][new_name] = {'owner': owner, 'content': self.tags[old_name]['content']}
-                del self.tags['tags'][old_name]
+                self.tags['tags'][new_name] = self.tags['tags'].pop(old_name)
                 self.save_tags()
                 return 'The tag "{}" has been renamed to "{}"'.format(old_name, new_name)
             return 'You are not the owner of the tag "{}"'.format(old_name)
@@ -274,6 +274,7 @@ class Tags:
             if self.tags['tags'][name]['owner'] == owner:
                 self.tags['tags'][name]['owner'] = new_owner
                 self.save_tags()
+                new_owner = self.find_owner_name(new_owner)
                 return 'The tag "{}" has been gifted to "{}"'.format(name, new_owner)
             return 'You are not the owner of the tag "{}"'.format(name)
         except KeyError:
