@@ -37,7 +37,7 @@ class Bot:
     def reload_group(self, stop=Event()):
         """
         :param stop: threading Event. not set by default so this method would be called every 10 minutes
-        :return: updates the nicknames of a group every 10 minutes
+        :return: updates the group name, group id, and group members of a group every 10 minutes
         """
         self.group.refresh_from_server()
         print("Members of {}: {}".format(self.group.name, self.group.members))
