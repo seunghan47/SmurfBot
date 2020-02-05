@@ -57,7 +57,7 @@ def main():
             except IndexError:
                 pass
 
-        with open(os.path.abspath(BOT_PATH + 'groups.json'), 'w') as finalized_groups:
+        with open(os.path.abspath(BOT_PATH + '/../groups.json'), 'w') as finalized_groups:
             json.dump(chosen_groups, finalized_groups, sort_keys=True, indent=2)
         groups = chosen_groups
 
