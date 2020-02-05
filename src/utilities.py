@@ -13,7 +13,6 @@ class Utilities:
     @staticmethod
     def post_help():
         """
-
         :return: a string containing what commands the bot has
         """
         return 'The commands are: tag, git, and avatar. Each one has their own help command except for git.'
@@ -21,7 +20,6 @@ class Utilities:
     @staticmethod
     def git():
         """
-
         :return: a url of the git repo of the source code
         """
         git_url = "https://github.com/nithjino/GroupMe_Bot"
@@ -29,7 +27,6 @@ class Utilities:
 
     def yt_search(self, query):
         """
-
         :param query: the search word(s) for youtube
         :return: youtube url of the first video in the search results
         """

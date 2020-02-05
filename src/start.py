@@ -6,14 +6,13 @@ import threading
 import json
 from time import sleep
 from groupy.client import Client
-from bot import Bot
+from .bot import Bot
 
 BOT_PATH = os.path.dirname(os.path.realpath(__file__))
 
 
 def main():
     """
-
     :return: sets up the groups the bot will listen and then initialize the threads
     """
     try:
@@ -79,7 +78,6 @@ def main():
 
 def consume(bot, seconds=1):
     """
-
     :param bot: Bot object that contains group and yt_key
     :param seconds: units in seconds that the parsing of messages will pause after each parsing
     :return: either will process the messages and if a command is present, it'll post in the group chat forever.
@@ -94,7 +92,6 @@ def consume(bot, seconds=1):
 
 def shutdown_bot():
     """
-
     :return: gracefully terminates the child threads and timers
     """
     print("Shutting down the bot")
