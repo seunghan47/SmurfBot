@@ -119,14 +119,15 @@ To attach to a detached container, follow these steps (assuming you ran it with 
  
  ```json
 {
-  "tag_name": {
-    "content": "some string, link to website/image/video/et, or groupme image/video url",
-    "owner": "owner_id_number"
-  },
-    "tag_name2": {
-    "content": "some string, link to website/image/video/et, or groupme image/video url",
-    "owner": "owner_id_number"
-  },
-  ...
-}
+  "id": "group id goes here",
+  "name": "group name goes here",
+  "tags": {
+    "tag1": {
+      "content": "tag1 content",
+      "owner": "owner id"
+    },
+    "tag2": {
+      "content": "tag2 content",
+      "owner": "owner id"
+    }
 ```
