@@ -83,6 +83,26 @@ class Tags:
         print("updating members of {}".format(self.group_name))
         self.members = members
 
+    def update_group_id(self, group_id):
+        """
+        :param group_id: id of group
+        :return: updates self.members
+        """
+        if group_id != self.group_id:
+            print("updating id of {}".format(self.group_name))
+            self.group_id = group_id
+            self.tags['id'] = self.group_id
+
+    def update_group_name(self, group_name):
+        """
+        :param group_name: name of group
+        :return: updates self.members
+        """
+        if group_name != self.group_name:
+            print("updating name of {}".format(self.group_name))
+            self.group_name = group_name
+            self.tags['name'] = self.group_name
+
     def parse_commands(self, message, owner, mentions):
         """
         :param message: contains the command and argument(s) for that command

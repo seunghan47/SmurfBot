@@ -16,7 +16,7 @@ class Bot:
         self.delim = delim
         self.ult = Utilities(yt_key)
         self.tags = Tags(group.name, group.id, group.members)
-        Timer(600, self.reload_members).start()
+        Timer(600, self.reload_group).start()
 
     def get_message(self):
         """
@@ -34,7 +34,7 @@ class Bot:
         """
         self.tags.reload_tags()
 
-    def reload_members(self, stop=Event()):
+    def reload_group(self, stop=Event()):
         """
         :param stop: threading Event. not set by default so this method would be called every 10 minutes
         :return: updates the nicknames of a group every 10 minutes
@@ -42,9 +42,12 @@ class Bot:
         self.group.refresh_from_server()
         print("Members of {}: {}".format(self.group.name, self.group.members))
         self.tags.update_members(self.group.members)
+        self.tags.update_group_id(self.group.id)
+        self.tags.update_group_name(self.group.name)
+        self.tags.save_tags()
 
         if not stop.is_set():
-            Timer(600, self.reload_members).start()
+            Timer(600, self.reload_group).start()
 
     def save_tags(self):
         """
