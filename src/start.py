@@ -28,7 +28,7 @@ client = Client.from_token(chat_key)
 groups = {}
 
 try:
-    with open(os.path.abspath(bot_path + '/../groups.json'),'r') as all_groups:
+    with open(os.path.abspath(bot_path + '/../groups.json'), 'r') as all_groups:
         groups = json.load(all_groups)
 except FileNotFoundError:
     potential_groups = []
@@ -44,7 +44,7 @@ except FileNotFoundError:
     chosen_groups = {}
     for choice in choices:
         try:
-            chosen_groups[potential_groups[int(choice) - 1][1]] = {"id":potential_groups[int(choice) - 1][0], "enabled": True}
+            chosen_groups[potential_groups[int(choice) - 1][1]] = {"id": potential_groups[int(choice) - 1][0], "enabled": True}
         except ValueError:
             pass
         except IndexError:
