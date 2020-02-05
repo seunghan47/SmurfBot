@@ -1,10 +1,17 @@
+"""Bot object each group will have that handle checking for commands and processing them"""
+from threading import Timer, Event
 from utilities import Utilities
 from tags import Tags
-from threading import Timer, Event
 
 
 class Bot:
+    """Bot object each group will have that handle checking for commands and processing them"""
     def __init__(self, group, yt_key=None, delim="$"):
+        """
+        :param group: the group this object will read messages from
+        :param yt_key: youtube api key. need it to use yt_search but not needed for other commands
+        :param delim: the first character that will let the bot know it is a command. default is "$"
+        """
         self.group = group
         self.delim = delim
         self.ult = Utilities(yt_key)
@@ -12,40 +19,66 @@ class Bot:
         Timer(600, self.reload_members).start()
 
     def get_message(self):
+        """
+        :return: returns the latest message from a group. if there is an error, return None
+        """
         try:
             return self.group.messages.list()[0]
-        except Exception as e:
-            print("bot.get_message: {}".format(e))
+        except Exception as err:
+            print("bot.get_message: {}".format(err))
             return None
 
     def reload_tags(self):
+        """
+        :return: reloads the tags in the Tag object
+        """
         self.tags.reload_tags()
 
     def reload_members(self, stop=Event()):
+        """
+        :param stop: threading Event. not set by default so this method would be called every 10 minutes
+        :return: updates the nicknames of a group every 10 minutes
+        """
         self.group.refresh_from_server()
         print("Members of {}: {}".format(self.group.name, self.group.members))
         self.tags.update_members(self.group.members)
 
         if not stop.is_set():
             Timer(600, self.reload_members).start()
-    
+
     def save_tags(self):
+        """
+        :return: writes the tags to a file for the group
+        """
         self.tags.save_tags()
-    
+
     def find_owner_name(self, user_id):
+        """
+        :param user_id: user_id of a member in the group
+        :return: returns the nickname associated with the user_id
+        """
         return list(filter(lambda x: x.user_id == user_id, self.group.members))[0]
 
     def find_avatar(self, message, mentions):
+        """
+        :param message: the avatar command. checks to see if it's a help call or actual usage
+        :param mentions: list of attachments with the message. uses it to check for mentions
+        :return: avatar url of person mentioned or an error message saying to mention the user
+        """
         if message[2] == "help":
             return "Usage: avatar [person]"
         else:
             mentions = list(filter(lambda x: x.type == "mentions", mentions))
-            if len(mentions) != 0:
+            if not mentions:
                 user_id = mentions[0].user_ids[0]
                 return self.find_owner_name(user_id).image_url
             return "Please mention the person you want the avatar of"
-    
+
     def process_message(self, message):
+        """
+        :param message: checks if the message is a valid comand and execute command it is associated with
+        :return: results of the command executed
+        """
         if message is not None:
             try:
                 message_text = message.text.lower()
@@ -70,15 +103,14 @@ class Bot:
                     if command == "tag":
                         result = self.tags.parse_commands(message_text, user_id, message.attachments)
 
-                    if result is None:
-                        return None
+                    if result is not None:
+                        print("posting \"{}\" in {}".format(result, self.group.name))
 
-                    print("posting \"{}\" in {}".format(result, self.group.name))
-                    
-                    if isinstance(result, list):
-                        for t in result:
-                            self.group.post(t)
-                    else:
-                        self.group.post(result)
-            except Exception as e:
-                print("bot.process_message: {}".format(e))
+                        if isinstance(result, list):
+                            for res in result:
+                                self.group.post(res)
+                        else:
+                            self.group.post(result)
+
+            except Exception as err:
+                print("bot.process_message: {}".format(err))
