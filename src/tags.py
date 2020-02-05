@@ -86,7 +86,7 @@ class Tags:
     def update_group_id(self, group_id):
         """
         :param group_id: id of group
-        :return: updates self.members
+        :return: updates group id in tags json
         """
         if group_id != self.group_id:
             print("updating id of {}".format(self.group_name))
@@ -96,7 +96,7 @@ class Tags:
     def update_group_name(self, group_name):
         """
         :param group_name: name of group
-        :return: updates self.members
+        :return: updates group name in tags json
         """
         if group_name != self.group_name:
             print("updating name of {}".format(self.group_name))
