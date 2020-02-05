@@ -15,7 +15,7 @@ class Bot:
         self.group = group
         self.delim = delim
         self.ult = Utilities(yt_key)
-        self.tags = Tags(group.name, group.members)
+        self.tags = Tags(group.name, group.id, group.members)
         Timer(600, self.reload_members).start()
 
     def get_message(self):
