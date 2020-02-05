@@ -43,8 +43,8 @@ JSON structure of `groups.json`
 
 ```json
 {
-  "group1": {"enabled": true, "id": 1000123123},
-  "group2": {"enabled": false, "id": 834234235}
+  "group1": {"enabled": true, "id": "1000123123"},
+  "group2": {"enabled": false, "id": "834234235"}
 }
 ```
 
