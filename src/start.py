@@ -90,7 +90,7 @@ def consume(bot, seconds=1):
     print("Stopping {} thread".format(thread.name))
 
 
-def shutdown_bot():
+def shutdown_bot(s, f):
     """
     :return: gracefully terminates the child threads and timers
     """
