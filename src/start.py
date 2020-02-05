@@ -28,31 +28,31 @@ client = Client.from_token(chat_key)
 groups = {}
 
 try:
-    with open('groups.json') as allGroups:
-        groups = json.load(allGroups)
+    with open(os.path.abspath(bot_path + '/../groups.json'),'r') as all_groups:
+        groups = json.load(all_groups)
 except FileNotFoundError:
-    potentialGroups = []
+    potential_groups = []
     for group in client.groups.list():
-        potentialGroups.append((group.id, group.name))
+        potential_groups.append((group.id, group.name))
 
     print("Which groups to use the bot for?")
 
-    for index, pair in enumerate(potentialGroups):
+    for index, pair in enumerate(potential_groups):
         print("{}: {}".format(index + 1, pair[1]))
 
     choices = input("Which ones (comma separated): ").split(",")
-    chosenGroups = {}
+    chosen_groups = {}
     for choice in choices:
         try:
-            chosenGroups[potentialGroups[int(choice) - 1][1]] = {"id":potentialGroups[int(choice) - 1][0], "enabled": True}
+            chosen_groups[potential_groups[int(choice) - 1][1]] = {"id":potential_groups[int(choice) - 1][0], "enabled": True}
         except ValueError:
             pass
         except IndexError:
             pass
 
-    with open('groups.json', 'w') as g:
-        json.dump(chosenGroups, g, sort_keys=True, indent=2)
-    groups = chosenGroups
+    with open(os.path.abspath(bot_path + 'groups.json'), 'w') as g:
+        json.dump(chosen_groups, g, sort_keys=True, indent=2)
+    groups = chosen_groups
 
 
 def consume(bot, s=1):
@@ -65,7 +65,6 @@ def consume(bot, s=1):
 
 
 for g in groups.values():
-    print(g)
     try:
         if g['enabled']:
             g = client.groups.get(g['id'])
