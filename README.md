@@ -97,7 +97,7 @@ To attach to a detached container, follow these steps (assuming you ran it with 
 | none          | [tag_name]                | tag cooltag                           |
 | list          | none                      | tag list                              |
 | owner         | [tag_name]                | tag owner cooltag                     |
-| gift          | [tag_name] @mention       | tag cooltag @new_owner                |
+| gift          | [tag_name] @mention       | tag gift cooltag @new_owner           |
 | rename        | [tag_name] [new tag_name] | tag rename cooltag coolertag          |
 | help          | none                      | tag help                              |
 
