@@ -1,5 +1,5 @@
 """Bot object each group will have that handle checking for commands and processing them"""
-from threading import Timer, Event
+from threading import Timer, Event, Thread
 from utilities import Utilities
 from tags import Tags
 
@@ -77,6 +77,22 @@ class Bot:
                 return self.find_owner_name(user_id).image_url
             return "Please mention the person you want the avatar of"
 
+    @staticmethod
+    def send_message(group, message):
+        """
+        :param group: group that will be receiving the message
+        :param message: message that will be sent to the group
+        :return: message should post in the group
+        """
+        try:
+            if isinstance(message, list):
+                for res in message:
+                    group.post(res)
+            else:
+                group.post(message)
+        except Exception as err:
+            print("bot.send_message: {}".format(err))
+
     def process_message(self, message):
         """
         :param message: checks if the message is a valid comand and execute command it is associated with
@@ -108,12 +124,6 @@ class Bot:
 
                     if result is not None:
                         print("posting \"{}\" in {}".format(result, self.group.name))
-
-                        if isinstance(result, list):
-                            for res in result:
-                                self.group.post(res)
-                        else:
-                            self.group.post(result)
-
+                        Thread(target=self.send_message, daemon=True, args=(self.group, result)).start()
             except Exception as err:
                 print("bot.process_message: {}".format(err))
