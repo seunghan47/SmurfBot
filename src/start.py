@@ -6,7 +6,7 @@ import threading
 import json
 from time import sleep
 from groupy.client import Client
-from src.bot import Bot
+from bot import Bot
 
 BOT_PATH = os.path.dirname(os.path.realpath(__file__))
 

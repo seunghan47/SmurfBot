@@ -1,7 +1,7 @@
 """Bot object each group will have that handle checking for commands and processing them"""
-from threading import Timer, Event, Thread
-from src.utilities import Utilities
-from src.tags import Tags
+from threading import Timer, Event
+from utilities import Utilities
+from tags import Tags
 
 
 class Bot:
