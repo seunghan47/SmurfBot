@@ -49,7 +49,7 @@ JSON structure of `groups.json`
 ```
 
 ## Docker
-Using the provided Dockerfile, you can build an image with `docker build -t groupme-bot`.
+Using the provided Dockerfile, you can build an image with `docker build -t groupme-bot .`
 
 If you don't mount a volume to the container, any tags that are made will be lost once the container is stopped.
 
