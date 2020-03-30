@@ -118,13 +118,6 @@ class Bot:
                     if command == "yt":
                         query = ' '.join(message_text[1:])
                         result = self.ult.yt_search(query)
-                    if command == "corona":
-                        if len(message_text) > 1:
-                            query = ' '.join(message_text[1:])
-                        else:
-                            query = ""
-                        print("corona query: {}".format(query))
-                        result = self.ult.corona(query)
                     if command == "tag":
                         result = self.tags.parse_commands(message_text, user_id, message.attachments)
 
