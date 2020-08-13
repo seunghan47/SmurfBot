@@ -2,6 +2,7 @@
 __pycache__
 groupme.key
 youtube_api.key
+keys.ini
 *.json
 *.out
 local.sh
