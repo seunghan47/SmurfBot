@@ -1,10 +1,7 @@
 .directory
 __pycache__
-groupme.key
-youtube_api.key
-keys.ini
+*.ini
 *.json
 *.out
 local.sh
-groups.txt
 *.swp
