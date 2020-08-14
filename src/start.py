@@ -2,8 +2,10 @@
 """Sets up and initializes the bot"""
 import signal
 import os
+import sys
 import threading
 import json
+import configparser
 from time import sleep
 from groupy.client import Client
 from bot import Bot
@@ -15,20 +17,22 @@ def main():
     """
     :return: sets up the groups the bot will listen and then initialize the threads
     """
+    parser = configparser.ConfigParser()
+    parser.read("config.ini")
     try:
-        chat_key = os.environ['GROUPME_KEY']
+        chat_key = parser['keys']['groupme']
     except KeyError:
-        with open(os.path.abspath(BOT_PATH + '/../creds/groupme.key'), 'r') as groupme_key:
-            chat_key = groupme_key.readline().strip()
+        print("Need groupme api key to continue")
+        sys.exit(1)
 
     try:
-        yt_key = os.environ['YT_KEY']
+        yt_key = parser['keys']['youtube']
     except KeyError:
-        try:
-            with open(os.path.abspath(BOT_PATH + '/../creds/youtube_api.key'), 'r') as yt_key:
-                yt_key = yt_key.readline().strip()
-        except FileNotFoundError:
-            yt_key = None
+        yt_key = None
+
+    delim = parser['bot']['delim']
+    refresh_group_interval = int(parser['bot']['refresh_group_interval'])
+    consume_time = float(parser['bot']['consume_time'])
 
     client = Client.from_token(chat_key)
     groups = {}
@@ -65,9 +69,9 @@ def main():
         try:
             if group['enabled']:
                 group = client.groups.get(group['id'])
-                bot = Bot(group, yt_key=yt_key)
+                bot = Bot(group, yt_key=yt_key, delim=delim, refresh_group_interval=refresh_group_interval)
                 print("creating thread for {}".format(group.name))
-                threading.Thread(target=consume, name=group.name, daemon=True, args=(bot, .1)).start()
+                threading.Thread(target=consume, name=group.name, daemon=True, args=(bot, consume_time)).start()
         except IndexError:
             print("'{}' group doesn't exist".format(group))
 

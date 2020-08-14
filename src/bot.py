@@ -6,7 +6,7 @@ from tags import Tags
 
 class Bot:
     """Bot object each group will have that handle checking for commands and processing them"""
-    def __init__(self, group, yt_key=None, delim="$"):
+    def __init__(self, group, yt_key=None, delim="$", refresh_group_interval=600):
         """
         :param group: the group this object will read messages from
         :param yt_key: youtube api key. need it to use yt_search but not needed for other commands
@@ -16,7 +16,7 @@ class Bot:
         self.delim = delim
         self.ult = Utilities(yt_key)
         self.tags = Tags(group.name, group.id, group.members)
-        Timer(600, self.reload_group).start()
+        Timer(refresh_group_interval, self.reload_group).start()
 
     def get_message(self):
         """
