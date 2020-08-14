@@ -7,8 +7,8 @@ WORKDIR /home/groupme
 USER groupme
 RUN mkdir app/
 RUN mkdir app/src/
-RUN mkdir app/creds/
 RUN mkdir app/logs/
 RUN mkdir app/tags/
 COPY src/* app/src/
+WORKDIR /home/groupme/app
 CMD ["python","app/src/start.py"]
