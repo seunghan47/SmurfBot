@@ -72,10 +72,11 @@ class Bot:
             return "Usage: avatar [person]"
         else:
             mentions = list(filter(lambda x: x.type == "mentions", mentions))
-            if not mentions:
+            if len(mentions) == 1:
                 user_id = mentions[0].user_ids[0]
+                print(self.find_owner_name(user_id).image_url)
                 return self.find_owner_name(user_id).image_url
-            return "Please mention the person you want the avatar of"
+            return "Please mention the one person you want the avatar of"
 
     def send_message(self, message):
         """
