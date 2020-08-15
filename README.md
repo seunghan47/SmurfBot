@@ -14,22 +14,22 @@ just a fun little side project for when I'm bored.
 ## Instructions
 Before the bot can listen to a group, it needs to be added to that group. Do that first or the bot won't work.
 
-There are multiple ways to run the bot.
+There are two ways to run the bot.
 
 1. python3 start.py
-2. scripts/bot.sh start|stop|restart (This one will run it as a background process)
-3. Docker
+2. Docker
 
 Make sure to change the information in main.py to what you want such as the location of your groupme key or youtube key.
 
 You have to pick a deliminator to use this bot. The default one is `$`. You can change it by passing it to the bot 
 object
 
-## Credentials
-The bot looks for Credentials in two places. It will look for the environmental variable first. Only credential that is required is the GroupMe key. The YT key is only needed if you want to do youtube searches with the bot.
+## Config and Credentials
+The bot looks for Credentials in `config.ini` that is at the root of the repo. An example file has been provided.
 
-1. Environmental Variables: Looks for the environmental variable `GROUPME_KEY` and `YT_KEY` and uses that value
-2. creds/groupme.key and creds/youtube_api.key: a text file with the token in the first line
+Here you can modify some other settings such as the delimeter used, how often the bot will look for messages, and
+how often the bot will refresh the names and members of the group.
+
 
 ## Groups
 On first start (assuming a groups.json doesn't exist), the bot will prompt you to select what groups to listen to.
@@ -60,7 +60,6 @@ Once the image is built, you can run it with:
 `docker run -ditv --rm -v [local tag folder]:/app/tags -v [local creds folder]:/app/creds 
 -v [local groups.json]:/home/groupme/app/groups.json --name groupme groupme-bot`
 
-add `-e GROUPME_KEY=[token]` if you need the token as an environmental variable
 
 add `-m [amount]` or `--cpus=[number]` to limit the ram or CPU cores the container can use
 
