@@ -126,4 +126,7 @@ class Bot:
                         print("posting \"{}\" in {}".format(result, self.group.name))
                         self.send_message(result)
             except Exception as err:
-                print("bot.process_message: {}".format(err))
+                if message.text is None:
+                    pass
+                else:
+                    print("bot.process_message: {}".format(err))
