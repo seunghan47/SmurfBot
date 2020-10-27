@@ -1,47 +1,57 @@
 #!/usr/bin/env python3
 """Sets up and initializes the bot"""
+import argparse
 import signal
 import os
 import sys
 import threading
 import json
 import configparser
+import groupy.exceptions
+import requests.exceptions
 from time import sleep
 from groupy.client import Client
 from bot import Bot
 
 BOT_PATH = os.path.dirname(os.path.realpath(__file__))
 
+parser = argparse.ArgumentParser(description="groupme bot")
+parser.add_argument("-c", "--config", help="ini file containing keys and other bot info", type=str, required=True)
+parser.add_argument("-g", "--groups", help="json file with the groups the bot will listen to", type=str, required=True)
+
 
 def main():
     """
     :return: sets up the groups the bot will listen and then initialize the threads
     """
-    parser = configparser.ConfigParser()
-    parser.read("config.ini")
+    args = parser.parse_args()
+    config_parser = configparser.ConfigParser()
+    config_path = os.path.abspath(args.config)
+    config_parser.read(config_path)
     try:
-        chat_key = parser['keys']['groupme']
+        chat_key = config_parser['keys']['groupme']
     except KeyError:
         print("Need groupme api key to continue")
         sys.exit(1)
 
     try:
-        yt_key = parser['keys']['youtube']
+        yt_key = config_parser['keys']['youtube']
     except KeyError:
         yt_key = None
 
-    delim = parser['bot']['delim']
-    refresh_group_interval = int(parser['bot']['refresh_group_interval'])
-    consume_time = float(parser['bot']['consume_time'])
+    delim = config_parser['bot']['delim']
+    refresh_group_interval = int(config_parser['bot']['refresh_group_interval'])
+    consume_time = float(config_parser['bot']['consume_time'])
 
     client = Client.from_token(chat_key)
     groups = {}
 
     try:
-        with open(os.path.abspath(BOT_PATH + '/../groups.json'), 'r') as all_groups:
+        with open(os.path.abspath(args.groups), 'r') as all_groups:
             groups = json.load(all_groups)
     except FileNotFoundError:
         potential_groups = []
+        group_file_path = os.path.abspath(args.groups)
         for group in client.groups.list():
             potential_groups.append((group.id, group.name))
 
@@ -61,19 +71,21 @@ def main():
             except IndexError:
                 pass
 
-        with open(os.path.abspath(BOT_PATH + '/../groups.json'), 'w') as finalized_groups:
+        with open(os.path.abspath(group_file_path), 'w') as finalized_groups:
             json.dump(chosen_groups, finalized_groups, sort_keys=True, indent=2)
+            print("created groups.json at {}".format(group_file_path))
         groups = chosen_groups
-
-    for group in groups.values():
+    for group in groups:
+        name = group
+        group = groups[group]
         try:
             if group['enabled']:
                 group = client.groups.get(group['id'])
                 bot = Bot(group, yt_key=yt_key, delim=delim, refresh_group_interval=refresh_group_interval)
                 print("creating thread for {}".format(group.name))
                 threading.Thread(target=consume, name=group.name, daemon=True, args=(bot, consume_time)).start()
-        except IndexError:
-            print("'{}' group doesn't exist".format(group))
+        except (IndexError, groupy.exceptions.BadResponse, requests.exceptions.HTTPError):
+            print("'{}' group doesn't exist".format(name))
 
     signal.signal(signal.SIGINT, shutdown_bot)
 
