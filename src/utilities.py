@@ -4,6 +4,7 @@ try:
 except ModuleNotFoundError:
     pass
 
+
 class Utilities:
     """contains functions not big enough to put into their own module"""
     def __init__(self, yt_key=None):
@@ -37,9 +38,3 @@ class Utilities:
         result = youtube.search().list(q=query, part="snippet", maxResults=1, type='video').execute()
         video_id = result['items'][0]['id']['videoId']
         return "http://youtu.be/{}".format(video_id)
-
-    def is_neg(self, num):
-        if num > 0:
-            return "+{}".format(num)
-        return num
-
