@@ -2,6 +2,7 @@
 from threading import Timer, Event
 from utilities import Utilities
 from tags import Tags
+import googleapiclient.errors
 
 
 class Bot:
@@ -125,6 +126,8 @@ class Bot:
                         print("{}: posting \"{}\"".format(self.group.name, result))
                         self.send_message(result)
             except Exception as err:
+                if type(err) == googleapiclient.errors.HttpError:
+                    self.send_message(str(err))
                 if message.text is None:
                     pass
                 else:
