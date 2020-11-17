@@ -103,7 +103,7 @@ def consume(bot, seconds=1):
     while getattr(thread, "do_run", True):
         bot.process_message(bot.get_message())
         sleep(seconds)
-    print("Stopping {} thread".format(thread.name))
+    print("{}: Stopping {} thread".format(bot.group.name, thread.name))
 
 
 def shutdown_bot(s, f):

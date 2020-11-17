@@ -25,7 +25,7 @@ class Bot:
         try:
             return self.group.messages.list()[0]
         except Exception as err:
-            print("bot.get_message: {}".format(err))
+            print("{}: bot.get_message: {}".format(self.group.name, err))
             return None
 
     def reload_tags(self):
@@ -40,7 +40,7 @@ class Bot:
         :return: updates the group name, group id, and group members of a group every 10 minutes
         """
         self.group.refresh_from_server()
-        print("Members of {}: {}".format(self.group.name, self.group.members))
+        print("{}: Members of {}: {}".format(self.group.name, self.group.name, self.group.members))
         self.tags.update_members(self.group.members)
         self.tags.update_group_id(self.group.id)
         self.tags.update_group_name(self.group.name)
@@ -74,7 +74,6 @@ class Bot:
             mentions = list(filter(lambda x: x.type == "mentions", mentions))
             if len(mentions) == 1:
                 user_id = mentions[0].user_ids[0]
-                print(self.find_owner_name(user_id).image_url)
                 return self.find_owner_name(user_id).image_url
             return "Please mention the one person you want the avatar of"
 
@@ -90,7 +89,7 @@ class Bot:
             else:
                 self.group.post(message)
         except Exception as err:
-            print("bot.send_message: {}".format(err))
+            print("{}: bot.send_message: {}".format(self.group.name, err))
 
     def process_message(self, message):
         """
@@ -107,8 +106,8 @@ class Bot:
                     message_text = message_text.split(" ")
                     command = message_text[0]
 
-                    print("Processing from {}: {}".format(owner, message_text))
-                    print("Command: {}".format(command))
+                    print("{}: Processing from {}: {}".format(self.group.name, owner, message_text))
+                    print("{}: Command: {}".format(self.group.name, command))
                     result = None
                     if command == "help":
                         result = self.ult.post_help()
@@ -123,10 +122,10 @@ class Bot:
                         result = self.tags.parse_commands(message_text, user_id, message.attachments)
 
                     if result is not None:
-                        print("posting \"{}\" in {}".format(result, self.group.name))
+                        print("{}: posting \"{}\"".format(self.group.name, result))
                         self.send_message(result)
             except Exception as err:
                 if message.text is None:
                     pass
                 else:
-                    print("bot.process_message: {}".format(err))
+                    print("{}: bot.process_message: {}".format(self.group.name, err))
