@@ -12,12 +12,17 @@ import requests.exceptions
 from time import sleep
 from groupy.client import Client
 from bot import Bot
+from datetime import datetime
 
 BOT_PATH = os.path.dirname(os.path.realpath(__file__))
 
 parser = argparse.ArgumentParser(description="groupme bot")
 parser.add_argument("-c", "--config", help="ini file containing keys and other bot info", type=str, required=True)
 parser.add_argument("-g", "--groups", help="json file with the groups the bot will listen to", type=str, required=True)
+
+
+def get_current_datetime():
+    return datetime.now().strftime("%m/%d/%Y %H:%M:%S")
 
 
 def main():
@@ -31,7 +36,7 @@ def main():
     try:
         chat_key = config_parser['keys']['groupme']
     except KeyError:
-        print("Need groupme api key to continue")
+        print("{} - Need groupme api key to continue".format(get_current_datetime()))
         sys.exit(1)
 
     try:
@@ -64,8 +69,7 @@ def main():
         chosen_groups = {}
         for choice in choices:
             try:
-                chosen_groups[potential_groups[int(choice) - 1][1]] = {"id": potential_groups[int(choice) - 1][0],
-                                                                       "enabled": True}
+                chosen_groups[potential_groups[int(choice) - 1][1]] = {"id": potential_groups[int(choice) - 1][0], "enabled": True}
             except ValueError:
                 pass
             except IndexError:
@@ -82,14 +86,14 @@ def main():
             if group['enabled']:
                 group = client.groups.get(group['id'])
                 bot = Bot(group, yt_key=yt_key, delim=delim, refresh_group_interval=refresh_group_interval)
-                print("creating thread for {}".format(group.name))
+                print("{} - creating thread for {}".format(get_current_datetime(), group.name))
                 threading.Thread(target=consume, name=group.name, daemon=True, args=(bot, consume_time)).start()
         except (IndexError, groupy.exceptions.BadResponse, requests.exceptions.HTTPError):
-            print("'{}' group doesn't exist".format(name))
+            print("{} - '{}' group doesn't exist".format(get_current_datetime(), name))
 
     signal.signal(signal.SIGINT, shutdown_bot)
 
-    print("Bot started up successfully")
+    print("{} - Bot started up successfully".format(get_current_datetime()))
 
 
 def consume(bot, seconds=1):
@@ -103,14 +107,14 @@ def consume(bot, seconds=1):
     while getattr(thread, "do_run", True):
         bot.process_message(bot.get_message())
         sleep(seconds)
-    print("{}: Stopping {} thread".format(bot.group.name, thread.name))
+    print("{} - {}: Stopping {} thread".format(get_current_datetime(), bot.group.name, thread.name))
 
 
 def shutdown_bot(s, f):
     """
     :return: gracefully terminates the child threads and timers
     """
-    print("Shutting down the bot")
+    print("{} - Shutting down the bot".format(get_current_datetime()))
     for thread in threading.enumerate():
         if isinstance(thread, threading.Thread) and thread.name != "MainThread":
             thread.do_run = False

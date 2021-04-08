@@ -3,6 +3,11 @@ from threading import Timer, Event
 from utilities import Utilities
 from tags import Tags
 import googleapiclient.errors
+from datetime import datetime
+
+
+def get_current_datetime():
+    return datetime.now().strftime("%m/%d/%Y %H:%M:%S")
 
 
 class Bot:
@@ -17,6 +22,7 @@ class Bot:
         self.delim = delim
         self.ult = Utilities(yt_key)
         self.tags = Tags(group.name, group.id, group.members)
+        self.valid_commands = ["avatar", "git", "yt", "tag", "help"]
         Timer(refresh_group_interval, self.reload_group).start()
 
     def get_message(self):
@@ -26,7 +32,7 @@ class Bot:
         try:
             return self.group.messages.list()[0]
         except Exception as err:
-            print("{}: bot.get_message: {}".format(self.group.name, err))
+            print("{} - Exception: {}: bot.get_message: {}".format(get_current_datetime(), self.group.name, err))
             return None
 
     def reload_tags(self):
@@ -41,7 +47,7 @@ class Bot:
         :return: updates the group name, group id, and group members of a group every 10 minutes
         """
         self.group.refresh_from_server()
-        print("{}: Members of {}: {}".format(self.group.name, self.group.name, self.group.members))
+        # print("{} - {}: Members of {}: {}".format(get_current_datetime(), self.group.name, self.group.name, self.group.members))
         self.tags.update_members(self.group.members)
         self.tags.update_group_id(self.group.id)
         self.tags.update_group_name(self.group.name)
@@ -90,7 +96,7 @@ class Bot:
             else:
                 self.group.post(message)
         except Exception as err:
-            print("{}: bot.send_message: {}".format(self.group.name, err))
+            print("{} - Exception: {}: bot.send_message: {}".format(get_current_datetime(), self.group.name, err))
 
     def process_message(self, message):
         """
@@ -100,15 +106,15 @@ class Bot:
         if message is not None:
             try:
                 message_text = message.text.lower()
-                if message_text[:len(self.delim)] == self.delim:
+                delim = message_text[:len(self.delim)]
+                message_text = message_text[len(self.delim):]
+                message_text = message_text.split(" ")
+                command = message_text[0]
+
+                if delim == self.delim and command in self.valid_commands:
                     user_id = message.user_id
                     owner = self.find_owner_name(user_id)
-                    message_text = message_text[len(self.delim):]
-                    message_text = message_text.split(" ")
-                    command = message_text[0]
-
-                    print("{}: Processing from {}: {}".format(self.group.name, owner, message_text))
-                    print("{}: Command: {}".format(self.group.name, command))
+                    print("{} - {}: Processing from {}: {}, Command: {}".format(get_current_datetime(), self.group.name, owner, message_text, command))
                     result = None
                     if command == "help":
                         result = self.ult.post_help()
@@ -123,7 +129,7 @@ class Bot:
                         result = self.tags.parse_commands(message_text, user_id, message.attachments)
 
                     if result is not None:
-                        print("{}: posting \"{}\"".format(self.group.name, result))
+                        print("{} - {}: posting \"{}\"".format(get_current_datetime(), self.group.name, result))
                         self.send_message(result)
             except Exception as err:
                 if type(err) == googleapiclient.errors.HttpError:
@@ -131,4 +137,4 @@ class Bot:
                 if message.text is None:
                     pass
                 else:
-                    print("{}: bot.process_message: {}".format(self.group.name, err))
+                    print("{} - {}: bot.process_message: {}".format(get_current_datetime(), self.group.name, err))
