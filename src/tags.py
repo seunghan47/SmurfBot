@@ -1,13 +1,16 @@
 """Handles all the tag related commands"""
 import json
 import os
-from atomicwrites import atomic_write
 from datetime import datetime
 from functools import reduce
 from itertools import zip_longest
+from atomicwrites import atomic_write
 
 
 def get_current_datetime():
+    """
+    :return: returns the current date and time
+    """
     return datetime.now().strftime("%m/%d/%Y %H:%M:%S")
 
 
@@ -46,13 +49,13 @@ class Tags:
 
         if not os.path.exists(tag_folder):
             os.makedirs(tag_folder)
-            print("{} - {}: created: {}".format(get_current_datetime(), self.group_name, tag_folder))
+            print(f"{get_current_datetime()} - {self.group_name}: created: {tag_folder}")
 
         if not os.path.exists(tag_json):
             create_json = {'name': self.group_name, 'id': self.group_id, 'tags': {}}
             with open(tag_json, 'w') as tags:
                 json.dump(create_json, tags)
-            print("{} - {}: created: {}".format(get_current_datetime(), self.group_name, tag_json))
+            print(f"{get_current_datetime()} - {self.group_name}: created: {tag_json}")
 
     def load_tags(self):
         """
@@ -60,7 +63,7 @@ class Tags:
         """
         self.create_json(self.group_id)
         tag_json = os.path.abspath(self.bot_path + "/../tags/" + self.group_id + '.json')
-        print("{} - {}: loading: {}".format(get_current_datetime(), self.group_name, tag_json))
+        print(f"{get_current_datetime()} - {self.group_name}: loading: {tag_json}")
         with open(tag_json, 'r') as tags:
             return json.load(tags)
 
@@ -69,7 +72,7 @@ class Tags:
         :return: dumps the group's tag to the disk
         """
         tag_json = os.path.abspath(self.bot_path + "/../tags/" + self.group_id + '.json')
-        print("{} - {}: saving: {}".format(get_current_datetime(), self.group_name, tag_json))
+        print(f"{get_current_datetime()} - {self.group_name}: saving: {tag_json}")
         with atomic_write(tag_json, overwrite=True) as tag_file:
             tag_file.write(json.dumps(self.tags, sort_keys=True, indent=2))
 
@@ -77,7 +80,7 @@ class Tags:
         """
         :return: updates the tags using the group's json file on disk
         """
-        print("{} - {}: reloading tags of {}".format(get_current_datetime(), self.group_name, self.group_name))
+        print(f"{get_current_datetime()} - {self.group_name}: reloading tags of {self.group_name}")
         self.tags = self.load_tags()
 
     def update_members(self, members):
@@ -85,7 +88,7 @@ class Tags:
         :param members: list of members from a group
         :return: updates self.members
         """
-        # print("{}: updating members of {}".format(self.group_name, self.group_name))
+        # print(f"{get_current_datetime()}: {self.group_name}: updating members of {self.group_name}")
         self.members = members
 
     def update_group_id(self, group_id):
@@ -94,7 +97,7 @@ class Tags:
         :return: updates group id in tags json
         """
         if group_id != self.group_id:
-            # print("{} - {} updating id of {}".format(get_current_datetime(), self.group_name, self.group_name))
+            # print(f"{get_current_datetime()} - {self.group_name}: updating id of {self.group_name}")
             self.group_id = group_id
             self.tags['id'] = self.group_id
 
@@ -104,7 +107,7 @@ class Tags:
         :return: updates group name in tags json
         """
         if group_name != self.group_name:
-            # print("{} - {}: updating name of {}".format(get_current_datetime(), self.group_name, self.group_name))
+            # print(f"{get_current_datetime()} - {self.group_name}: updating name of {self.group_name}")
             self.group_name = group_name
             self.tags['name'] = self.group_name
 
@@ -164,10 +167,10 @@ class Tags:
         :return: confirmation that the tag was created or if it already exists
         """
         if name in self.tags['tags']:
-            return 'The tag "{}" already exists'.format(name)
+            return f"The tag \"{name}\" already exists"
         self.tags['tags'][name] = {'owner': owner, 'content': content}
         self.save_tags()
-        return 'The tag "{}" was created successfully'.format(name)
+        return f"The tag \"{name}\" was created successfully"
 
     @staticmethod
     def get_tag_content(message, mentions):
@@ -186,13 +189,13 @@ class Tags:
         :param name: key of the tag content
         :return: content of the tag or a message saying the tag doesn't exist
         """
-        print("{} - {}: searching for tag: {}".format(get_current_datetime(), self.group_name, name))
+        print(f"{get_current_datetime()} - {self.group_name}: searching for tag: {name}")
         if name in self.tags['tags']:
             content = self.tags['tags'][name]['content']
             if content.split(" ")[0] == "$tag":
                 return self.post_tag(content.split(" ")[1])
             return content
-        return 'The tag "{}" does not exist'.format(name)
+        return f"The tag \"{name}\" does not exist"
 
     def delete_tag(self, name, owner):
         """
@@ -207,10 +210,10 @@ class Tags:
             if self.tags['tags'][name]['owner'] == owner:
                 del self.tags['tags'][name]
                 self.save_tags()
-                return 'The tag "{}" has been deleted'.format(name)
-            return 'You are not the owner of the tag "{}"'.format(name)
+                return f"The tag \"{name}\" has been deleted"
+            return f"You are not the owner of the tag \"{name}\""
         except KeyError:
-            return 'The tag "{}" does not exist'.format(name)
+            return f"The tag \"{name}\" does not exist"
 
     def list_tags(self):
         """
@@ -240,10 +243,10 @@ class Tags:
             if self.tags['tags'][name]['owner'] == owner:
                 self.tags['tags'][name]['content'] = content
                 self.save_tags()
-                return 'The tag "{}" has been edited'.format(name)
-            return 'You are not the owner of the tag "{}"'.format(name)
+                return f"The tag \"{name}\" has been edited"
+            return f"You are not the owner of the tag \"{name}\""
         except KeyError:
-            return 'The tag "{}" does not exist'.format(name)
+            return f"The tag \"{name}\" does not exist"
 
     def rename_tag(self, old_name, new_name, owner):
         """
@@ -252,19 +255,19 @@ class Tags:
         :param owner: user id of whoever invoked this command
         :return: updates the tag's name or returns a message saying you can't
         """
-        print("{} - {}: Renaming tag '{}' to '{}'".format(get_current_datetime(), self.group_name, old_name, new_name))
+        print(f"{get_current_datetime()} - {self.group_name}: Renaming tag '{old_name}' to '{new_name}'")
         if not self.tags['tags']:
             return "There are no tags"
         if new_name in self.tags['tags']:
-            return 'The tag "{}" already exists. Can\'t change name to it'.format(new_name)
+            return f"The tag \"{new_name}\" already exists. Can't change {old_name} to it"
         try:
             if self.tags['tags'][old_name]['owner'] == owner:
                 self.tags['tags'][new_name] = self.tags['tags'].pop(old_name)
                 self.save_tags()
-                return 'The tag "{}" has been renamed to "{}"'.format(old_name, new_name)
-            return 'You are not the owner of the tag "{}"'.format(old_name)
+                return f"The tag \"{old_name}\" has been renamed to \"{new_name}\""
+            return f"You are not the owner of the tag \"{old_name}\""
         except KeyError:
-            return 'The tag "{}" does not exist'.format(old_name)
+            return f"The tag \"{old_name}\" does not exist"
 
     def gift_tag(self, name, owner, new_owner):
         """
@@ -280,10 +283,10 @@ class Tags:
                 self.tags['tags'][name]['owner'] = new_owner
                 self.save_tags()
                 new_owner = self.find_owner_name(new_owner)
-                return 'The tag "{}" has been gifted to "{}"'.format(name, new_owner)
-            return 'You are not the owner of the tag "{}"'.format(name)
+                return f"The tag \"{name}\" has been gifted to {new_owner}"
+            return f"You are not the owner of the tag \"{name}\""
         except KeyError:
-            return 'The tag "{}" does not exist'.format(name)
+            return f"The tag \"{name}\" does not exist"
 
     def filter_tags(self, keyword):
         """
@@ -293,8 +296,9 @@ class Tags:
         filtered_tags = list(filter(lambda x: keyword in x, self.tags['tags'].keys()))
         filtered_tags = ', '.join(filtered_tags)
         if not filtered_tags:
-            return 'No tags contain the word {}'.format(keyword)
+            return "No tags contain the word {keyword}"
 
+        # there is a character limit for a groupme message
         if len(filtered_tags) > 1000:
             tag_names = list(map(''.join, zip_longest(*[iter(filtered_tags)] * 1000, fillvalue='')))
             return tag_names
@@ -308,8 +312,8 @@ class Tags:
         """
         if name in self.tags['tags']:
             owner = self.find_owner_name(self.tags['tags'][name]['owner'])
-            return "The owner of {} is {}".format(name, owner)
-        return 'The tag "{}" does not exist'.format(name)
+            return f"The owner of \"{name}\" is {owner}"
+        return f"The tag \"{name}\" does not exist"
 
     def find_owner_name(self, user_id):
         """
