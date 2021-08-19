@@ -23,7 +23,7 @@ class Utilities:
         :return: a url of the git repo of the source code
         """
         git_url = "https://github.com/nithjino/GroupMe_Bot"
-        return "Here is the source code " + git_url
+        return f"Here is the source code: {git_url} "
 
     def yt_search(self, query):
         """
@@ -37,4 +37,4 @@ class Utilities:
         youtube = googleapiclient.discovery.build(api_service_name, api_version, developerKey=self.yt_key)
         result = youtube.search().list(q=query, part="snippet", maxResults=1, type='video').execute()
         video_id = result['items'][0]['id']['videoId']
-        return "http://youtu.be/{}".format(video_id)
+        return f"http://youtu.be/{video_id}"
