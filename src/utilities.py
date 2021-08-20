@@ -1,4 +1,5 @@
 """contains functions not big enough to put into their own module"""
+from datetime import datetime
 try:
     import googleapiclient.discovery
 except ModuleNotFoundError:
@@ -24,6 +25,13 @@ class Utilities:
         """
         git_url = "https://github.com/nithjino/GroupMe_Bot"
         return f"Here is the source code: {git_url} "
+    @staticmethod
+    def log(message):
+        """
+        :return: returns the current date and time
+        """
+        t = datetime.now().strftime("%m/%d/%Y %H:%M:%S")
+        print(f"{t} - {message}")
 
     def yt_search(self, query):
         """
