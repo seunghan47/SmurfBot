@@ -1,17 +1,8 @@
 """Bot object each group will have that handle checking for commands and processing them"""
 from threading import Timer, Event
-from datetime import datetime
 import googleapiclient.errors
 from utilities import Utilities
 from tags import Tags
-
-
-
-def get_current_datetime():
-    """
-    :return: returns the current date and time
-    """
-    return datetime.now().strftime("%m/%d/%Y %H:%M:%S")
 
 
 class Bot:
@@ -36,7 +27,7 @@ class Bot:
         try:
             return self.group.messages.list()[0]
         except Exception as err:
-            print(f"{get_current_datetime()} - Exception: {self.group.name}: bot.get_message: {err}")
+            Utilities.log("Exception: {self.group.name}: bot.get_message: {err}")
             return None
 
     def reload_tags(self):
@@ -100,7 +91,7 @@ class Bot:
             else:
                 self.group.post(message)
         except Exception as err:
-            print(f"{get_current_datetime()} - Exception: {self.group.name}: bot.send_message: {err}")
+            Utilities.log(f"Exception: {self.group.name}: bot.send_message: {err}")
 
     def process_message(self, message):
         """
@@ -118,7 +109,7 @@ class Bot:
                 if delim == self.delim and command in self.valid_commands:
                     user_id = message.user_id
                     owner = self.find_owner_name(user_id)
-                    print(f"{get_current_datetime()} - {self.group.name}: Processing from {owner}: {message_text}, Command: {command}")
+                    Utilities.log(f"{self.group.name}: Processing from {owner}: {message_text}, Command: {command}")
                     result = None
                     if command == "help":
                         result = self.ult.post_help()
@@ -133,7 +124,7 @@ class Bot:
                         result = self.tags.parse_commands(message_text, user_id, message.attachments)
 
                     if result is not None:
-                        print(f"{get_current_datetime()} - {self.group.name}: posting \"{result}\"")
+                        Utilities.log(f"{self.group.name}: posting \"{result}\"")
                         self.send_message(result)
             except Exception as err:
                 if isinstance(err, googleapiclient.errors.HttpError):
@@ -141,4 +132,4 @@ class Bot:
                 if message.text is None:
                     pass
                 else:
-                    print(f"{get_current_datetime()} - {self.group.name}: bot.process_message: {err}")
+                    Utilities.log(f"{self.group.name}: bot.process_message: {err}")
