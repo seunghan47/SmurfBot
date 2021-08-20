@@ -24,7 +24,8 @@ class Utilities:
         :return: a url of the git repo of the source code
         """
         git_url = "https://github.com/nithjino/GroupMe_Bot"
-        return f"Here is the source code: {git_url} "
+        return f"Here is the source code: {git_url}"
+
     @staticmethod
     def log(message):
         """
