@@ -42,7 +42,6 @@ class Bot:
         :return: updates the group name, group id, and group members of a group every 10 minutes
         """
         self.group.refresh_from_server()
-        # print(f"{get_current_datetime()} - {self.group.name}: Members of {self.group.name}: {self.group.members}")
         self.tags.update_members(self.group.members)
         self.tags.update_group_id(self.group.id)
         self.tags.update_group_name(self.group.name)
