@@ -1,17 +1,10 @@
 """Handles all the tag related commands"""
 import json
 import os
-from datetime import datetime
 from functools import reduce
 from itertools import zip_longest
 from atomicwrites import atomic_write
-
-
-def get_current_datetime():
-    """
-    :return: returns the current date and time
-    """
-    return datetime.now().strftime("%m/%d/%Y %H:%M:%S")
+from utilities import Utilities
 
 
 class Tags:
@@ -49,13 +42,13 @@ class Tags:
 
         if not os.path.exists(tag_folder):
             os.makedirs(tag_folder)
-            print(f"{get_current_datetime()} - {self.group_name}: created: {tag_folder}")
+            Utilities.log(f"{self.group_name}: created: {tag_folder}")
 
         if not os.path.exists(tag_json):
             create_json = {'name': self.group_name, 'id': self.group_id, 'tags': {}}
             with open(tag_json, 'w') as tags:
                 json.dump(create_json, tags)
-            print(f"{get_current_datetime()} - {self.group_name}: created: {tag_json}")
+            Utilities.log(f"{self.group_name}: created: {tag_json}")
 
     def load_tags(self):
         """
@@ -63,7 +56,7 @@ class Tags:
         """
         self.create_json(self.group_id)
         tag_json = os.path.abspath(self.bot_path + "/../tags/" + self.group_id + '.json')
-        print(f"{get_current_datetime()} - {self.group_name}: loading: {tag_json}")
+        Utilities.log(f"{self.group_name}: loading: {tag_json}")
         with open(tag_json, 'r') as tags:
             return json.load(tags)
 
@@ -72,7 +65,7 @@ class Tags:
         :return: dumps the group's tag to the disk
         """
         tag_json = os.path.abspath(self.bot_path + "/../tags/" + self.group_id + '.json')
-        print(f"{get_current_datetime()} - {self.group_name}: saving: {tag_json}")
+        Utilities.log(f"{self.group_name}: saving: {tag_json}")
         with atomic_write(tag_json, overwrite=True) as tag_file:
             tag_file.write(json.dumps(self.tags, sort_keys=True, indent=2))
 
@@ -80,7 +73,7 @@ class Tags:
         """
         :return: updates the tags using the group's json file on disk
         """
-        print(f"{get_current_datetime()} - {self.group_name}: reloading tags of {self.group_name}")
+        Utilities.log(f"{self.group_name}: reloading tags of {self.group_name}")
         self.tags = self.load_tags()
 
     def update_members(self, members):
@@ -88,7 +81,6 @@ class Tags:
         :param members: list of members from a group
         :return: updates self.members
         """
-        # print(f"{get_current_datetime()}: {self.group_name}: updating members of {self.group_name}")
         self.members = members
 
     def update_group_id(self, group_id):
@@ -97,7 +89,6 @@ class Tags:
         :return: updates group id in tags json
         """
         if group_id != self.group_id:
-            # print(f"{get_current_datetime()} - {self.group_name}: updating id of {self.group_name}")
             self.group_id = group_id
             self.tags['id'] = self.group_id
 
@@ -107,7 +98,6 @@ class Tags:
         :return: updates group name in tags json
         """
         if group_name != self.group_name:
-            # print(f"{get_current_datetime()} - {self.group_name}: updating name of {self.group_name}")
             self.group_name = group_name
             self.tags['name'] = self.group_name
 
@@ -189,7 +179,7 @@ class Tags:
         :param name: key of the tag content
         :return: content of the tag or a message saying the tag doesn't exist
         """
-        print(f"{get_current_datetime()} - {self.group_name}: searching for tag: {name}")
+        Utilities.log(f"{self.group_name}: searching for tag: {name} to post")
         if name in self.tags['tags']:
             content = self.tags['tags'][name]['content']
             if content.split(" ")[0] == "$tag":
@@ -204,6 +194,7 @@ class Tags:
         :return: deletes key if owner passed to this method matches the owner of the tag. otherwise, returns
         an error message
         """
+        Utilities.log(f"{self.group_name}: searching for tag: {name} to delete")
         if not self.tags['tags']:
             return 'There are no tags'
         try:
@@ -255,7 +246,7 @@ class Tags:
         :param owner: user id of whoever invoked this command
         :return: updates the tag's name or returns a message saying you can't
         """
-        print(f"{get_current_datetime()} - {self.group_name}: Renaming tag '{old_name}' to '{new_name}'")
+        Utilities.log(f"{self.group_name}: Renaming tag \"{old_name}\" to \"{new_name}\"")
         if not self.tags['tags']:
             return "There are no tags"
         if new_name in self.tags['tags']:
@@ -276,6 +267,7 @@ class Tags:
         :param new_owner: user id of new owner of the tag
         :return: updates owner or returns a message saying you can't
         """
+        Utilities.log(f"Attempting to gift the tag \"{name}\" from {owner} to {new_owner}")
         if not self.tags['tags']:
             return "There are no tags"
         try:
@@ -310,6 +302,7 @@ class Tags:
         :param name: tag name
         :return: nickname of the owner of the tag
         """
+        Utilities.log(f"Attempting to find the owner of the tag \"{name}\"")
         if name in self.tags['tags']:
             owner = self.find_owner_name(self.tags['tags'][name]['owner'])
             return f"The owner of \"{name}\" is {owner}"
@@ -320,6 +313,7 @@ class Tags:
         :param user_id: integer representing the user id of a potential group member
         :return:
         """
+        Utilities.log(f"Attempting to find the name of the user_id \"{user_id}\"")
         try:
             return list(filter(lambda x: x.user_id == user_id, self.members))[0].nickname
         except IndexError:
