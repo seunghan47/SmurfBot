@@ -8,24 +8,17 @@ import threading
 import json
 import configparser
 from time import sleep
-from datetime import datetime
 import groupy.exceptions
 import requests.exceptions
 from groupy.client import Client
 from bot import Bot
+from utilities import Utilities
 
 BOT_PATH = os.path.dirname(os.path.realpath(__file__))
 
 parser = argparse.ArgumentParser(description="groupme bot")
 parser.add_argument("-c", "--config", help="ini file containing keys and other bot info", type=str, required=True)
 parser.add_argument("-g", "--groups", help="json file with the groups the bot will listen to", type=str, required=True)
-
-
-def get_current_datetime():
-    """
-    :return: returns the current date and time
-    """
-    return datetime.now().strftime("%m/%d/%Y %H:%M:%S")
 
 
 def main():
@@ -39,7 +32,7 @@ def main():
     try:
         chat_key = config_parser['keys']['groupme']
     except KeyError:
-        print(f"{get_current_datetime()} - Need groupme api key to continue")
+        Utilities.log(f"Need groupme api key to continue")
         sys.exit(1)
 
     try:
@@ -89,14 +82,14 @@ def main():
             if group['enabled']:
                 group = client.groups.get(group['id'])
                 bot = Bot(group, yt_key=yt_key, delim=delim, refresh_group_interval=refresh_group_interval)
-                print(f"{get_current_datetime()} - creating thread for {group.name}")
+                Utilities.log(f"creating thread for {group.name}")
                 threading.Thread(target=consume, name=group.name, daemon=True, args=(bot, consume_time)).start()
         except (IndexError, groupy.exceptions.BadResponse, requests.exceptions.HTTPError):
-            print(f"{get_current_datetime()} - '{name}' group doesn't exist")
+            Utilities.log(f"'{name}' group doesn't exist")
 
     signal.signal(signal.SIGINT, shutdown_bot)
 
-    print(f"{get_current_datetime()} - Bot started up successfully")
+    Utilities.log(f"Bot started up successfully")
 
 
 def consume(bot, seconds=1):
@@ -110,20 +103,20 @@ def consume(bot, seconds=1):
     while getattr(thread, "do_run", True):
         bot.process_message(bot.get_message())
         sleep(seconds)
-    print(f"{get_current_datetime()} - {bot.group.name}: Stopping {thread.name} thread")
+    Utilities.log(f"{bot.group.name}: Stopping {thread.name} thread")
 
 
 def shutdown_bot(s, f):
     """
     :return: gracefully terminates the child threads and timers
     """
-    print(f"{get_current_datetime()} - Shutting down the bot")
+    Utilities.log("Shutting down the bot...")
     for thread in threading.enumerate():
         if isinstance(thread, threading.Thread) and thread.name != "MainThread":
             thread.do_run = False
         if isinstance(thread, threading.Timer):
             thread.cancel()
-
+    Utilities.log("Bot successfully shutdown")
 
 if __name__ == '__main__':
     main()
