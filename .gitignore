@@ -1,8 +1,10 @@
 .directory
+.idea
 __pycache__
+.vscode
 *.ini
 *.json
 *.out
 local.sh
 *.swp
-.idea
+test.py
