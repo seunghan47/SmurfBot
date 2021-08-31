@@ -23,7 +23,7 @@ class Utilities:
         """
         :return: a url of the git repo of the source code
         """
-        git_url = "https://github.com/nithjino/GroupMe_Bot"
+        git_url = "https://github.com/nithjino/SmurfBot"
         return f"Here is the source code: {git_url}"
 
     @staticmethod
