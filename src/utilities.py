@@ -37,7 +37,7 @@ class Utilities:
     def set_yt_key(self, key):
         self.yt_key = key
 
-    def yt_search(self, query):
+    async def yt_search(self, query):
         """
         :param query: the search word(s) for youtube
         :return: youtube url of the first video in the search results

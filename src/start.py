@@ -27,7 +27,8 @@ def parse_tag_commands(**kwargs):
 
 
 def yt_search(**kwargs):
-    query = ' '.join(kwargs['args'][:-1])
+    Utilities.log(f"yt_search kwargs: {kwargs}")
+    query = ' '.join(kwargs['args'][:-2])
     return ult.yt_search(query)
 
 
