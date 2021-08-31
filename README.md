@@ -1,15 +1,15 @@
-# GroupMe_Bot
-This is a bot I'm working on a small groupme group I'm in. This is something I'll work on in my spare time. Nothing but 
-just a fun little side project for when I'm bored.
+# SmurfBot
+This is a bot I'm working on for a small discord group I'm in. This is something I'll work on in my spare time.
+This was originally for a groupme chat, but we transitioned to discord.
+Nothing but just a fun little side project for when I'm bored.
 
 ## Libraries used
-[Groupy: an API wrapper for Groupme](https://github.com/rhgrant10/Groupy)
+[Discord.py](https://discordpy.readthedocs.io/en/stable/#)
 
 [python-atomicwrites: Powerful Python library for atomic file writes](https://github.com/untitaker/python-atomicwrites)
 
 [google-api-python-client](https://developers.google.com/youtube/v3/quickstart/python) (only needed if you will be doing yt searches from the bot)
 
-[Documentation for Groupy](http://groupy.readthedocs.io/en/master/index.html)
 
 ## Instructions
 Before the bot can listen to a group, it needs to be added to that group. Do that first or the bot won't work.
@@ -27,38 +27,15 @@ object
 ## Config and Credentials
 The bot looks for Credentials in `config.ini` that is at the root of the repo. An example file has been provided.
 
-Here you can modify some other settings such as the delimeter used, how often the bot will look for messages, and
-how often the bot will refresh the names and members of the group.
-
-
-## Groups
-On first start (assuming a groups.json doesn't exist), the bot will prompt you to select what groups to listen to.
-It will create a groups.json where the key is the group name and the value will be a dictionary with
-an `id` and `enabled` keys. If `enabled` is set to true, it will listen to that chat. `id` is the group id
-and since it will use that to find the group, the group name can change but the bot will still be able to listen
-to it. If you are running this from docker, it is best to use the docker command below but with `-it` first instead of
-`-ditv`
-
-JSON structure of `groups.json`
-
-```json
-{
-  "group1": {"enabled": true, "id": "1000123123"},
-  "group2": {"enabled": false, "id": "834234235"}
-}
-```
 
 ## Docker
 Using the provided Dockerfile, you can build an image with `docker build -t groupme-bot .`
 
 If you don't mount a volume to the container, any tags that are made will be lost once the container is stopped.
 
-If you don't mount a volume that contains `groupme.key` to `/app/creds`, you need to pass it in as an environmental variable
-
 Once the image is built, you can run it with:
 
-`docker run -ditv --rm -v [local tag folder]:/app/tags -v [local creds folder]:/app/creds 
--v [local groups.json]:/home/groupme/app/groups.json --name groupme groupme-bot`
+`docker run -ditv --rm -v [local tag folder]:/home/groupme/app/tags -v [local config.ini]:/home/groupme/app/config.ini --name groupme groupme-bot`
 
 
 add `-m [amount]` or `--cpus=[number]` to limit the ram or CPU cores the container can use
