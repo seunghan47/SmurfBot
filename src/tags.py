@@ -3,6 +3,8 @@ import json
 import os
 from functools import reduce
 from itertools import zip_longest
+
+import discord
 from atomicwrites import atomic_write
 from utilities import Utilities
 
@@ -66,8 +68,9 @@ class Tags:
         print(f"tags parse_commands kwargs: {kwargs}")
         message = kwargs['args']
         command = message[0].rstrip()
+        tag_result = ''
         if command == "create":
-            tag_result = self.create_tag(kwargs['args'][1], ' '.join(kwargs['args'][2: -1]),kwargs['args'][-1])
+            tag_result = self.create_tag(kwargs['args'][1], ' '.join(kwargs['args'][2: -1]), kwargs['args'][-1])
         elif command == "delete":
             tag_result = self.delete_tag(kwargs['args'][1], kwargs['args'][2])
         elif command == "list":
@@ -81,7 +84,7 @@ class Tags:
         elif command == "gift":
             pass
         elif command == "owner":
-            pass
+            tag_result = self.find_owner(kwargs['args'][1], kwargs['args'][2])
         elif command == "filter":
             tag_result = self.filter_tags(kwargs['args'][1])
         else:
@@ -89,22 +92,19 @@ class Tags:
 
         return tag_result
 
-    def create_tag(self, name, content, owner):
+    async def create_tag(self, name, content, owner):
         if name in self.tags['tags']:
             return f"The tag \"{name}\" already exists"
         self.tags['tags'][name] = {'owner': owner, 'content': content}
         self.save_tags()
         return f"The tag \"{name}\" was created successfully"
 
-    def get_tag_content(self, message, mentions):
-        pass
-
-    def post_tag(self, name):
+    async def post_tag(self, name):
         if name in self.tags['tags']:
             return self.tags['tags'][name]['content']
         return f"The tag \"{name}\" does not exist"
 
-    def delete_tag(self, name, owner):
+    async def delete_tag(self, name, owner):
         if not self.tags['tags']:
             return 'There are no tags'
 
@@ -117,7 +117,7 @@ class Tags:
 
         return f"The tag \"{name}\" does not exist"
 
-    def list_tags(self):
+    async def list_tags(self):
         if not self.tags['tags']:
             return 'No tags exist'
 
@@ -129,24 +129,28 @@ class Tags:
         '''
         return all_tags
 
-    def edit_tag(self, name, owner, content):
+    async def edit_tag(self, name, owner, content):
         pass
 
-    def rename_tag(self, old_name, new_name, owner):
+    async def rename_tag(self, old_name, new_name, owner):
         pass
 
-    def gift_tag(self, name, owner, new_owner):
+    async def gift_tag(self, name, owner, new_owner):
         pass
 
-    def filter_tags(self, keyword):
+    async def filter_tags(self, keyword):
         filtered_tags = list(filter(lambda x: keyword in x, self.tags['tags'].keys()))
         filtered_tags = ', '.join(filtered_tags)
         if not filtered_tags:
             return f"No tags contain the word {keyword}"
         return filtered_tags
 
-    def find_owner(self, name):
-        pass
+    async def find_owner(self, name, fetch_user_func):
+        if name in self.tags['tags']:
+            try:
+                user = await fetch_user_func(self.tags['tags'][name]['owner'])
+                return f"The owner of \"{name}\" is {user.name}"
+            except (discord.NotFound, discord.HTTPException):
+                return f"Ran into an error when trying to get the owner of \"{name}\""
 
-    def find_owner_name(self, user_id):
-       pass
+        return f"The tag \"{name}\" does not exist"
