@@ -64,10 +64,12 @@ async def on_message(message):
             args = command[1:]
             if message.attachments:
                 args.append(message.attachments[0].url)
+            if command[0] == 'tag' and args[0] == 'owner':
+                args.append(client.fetch_user)
             args.append(message.author.id)
             args.append(message.channel.guild.id)
             command = command[0]
-            result = valid_commands[command](args=args)
+            result = await valid_commands[command](args=args)
             await message.channel.send(result)
         else:
             await message.channel.send(f"{command} isn't a valid command")
