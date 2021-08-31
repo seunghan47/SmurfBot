@@ -34,6 +34,9 @@ class Utilities:
         t = datetime.now().strftime("%m/%d/%Y %H:%M:%S")
         print(f"{t} - {message}")
 
+    def set_yt_key(self, key):
+        self.yt_key = key
+
     def yt_search(self, query):
         """
         :param query: the search word(s) for youtube
@@ -44,6 +47,10 @@ class Utilities:
         api_service_name = "youtube"
         api_version = "v3"
         youtube = googleapiclient.discovery.build(api_service_name, api_version, developerKey=self.yt_key)
-        result = youtube.search().list(q=query, part="snippet", maxResults=1, type='video').execute()
-        video_id = result['items'][0]['id']['videoId']
-        return f"http://youtu.be/{video_id}"
+        try:
+            result = youtube.search().list(q=query, part="snippet", maxResults=1, type='video').execute()
+            video_id = result['items'][0]['id']['videoId']
+            return f"http://youtu.be/{video_id}"
+        except Exception as e:
+            print(e)
+            return "Error with accessing youtube api"

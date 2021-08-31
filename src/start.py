@@ -8,6 +8,7 @@ from tags import Tags
 from utilities import Utilities
 
 client = discord.Client()
+ult = Utilities()
 BOT_PATH = os.path.dirname(os.path.realpath(__file__))
 delim = '$'
 tags = {}
@@ -25,9 +26,15 @@ def parse_tag_commands(**kwargs):
     return tag.parse_commands(args=args)
 
 
+def yt_search(**kwargs):
+    query = ' '.join(kwargs['args'][:-1])
+    return ult.yt_search(query)
+
+
 valid_commands = {
     'ping': ping,
-    'tag': parse_tag_commands
+    'tag': parse_tag_commands,
+    'yt': yt_search
 }
 
 
@@ -42,6 +49,7 @@ async def on_ready():
             if channel.guild.id not in tags:
                 tags[channel.guild.id] = Tags(channel.guild, tag_json_path)
     print('Initializing Done')
+
 
 @client.event
 async def on_message(message):
@@ -69,6 +77,8 @@ def main():
     args = parser.parse_args()
 
     config_parser.read(os.path.abspath(args.config))
+    if 'youtube' in config_parser['keys']:
+        ult.set_yt_key(config_parser['keys']['youtube'])
     client.run(config_parser['keys']['discord'])
 
 
