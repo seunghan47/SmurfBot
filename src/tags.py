@@ -67,9 +67,9 @@ class Tags:
         message = kwargs['args']
         command = message[0].rstrip()
         if command == "create":
-            tag_result = self.create_tag(kwargs['args'][1], kwargs['args'][3],kwargs['args'][2])
+            tag_result = self.create_tag(kwargs['args'][1], ' '.join(kwargs['args'][2: -1]),kwargs['args'][-1])
         elif command == "delete":
-            pass
+            tag_result = self.delete_tag(kwargs['args'][1], kwargs['args'][2])
         elif command == "list":
             tag_result = self.list_tags()
         elif command == "help":
@@ -83,7 +83,7 @@ class Tags:
         elif command == "owner":
             pass
         elif command == "filter":
-            pass
+            tag_result = self.filter_tags(kwargs['args'][1])
         else:
             tag_result = self.post_tag(command.strip())
 
@@ -105,7 +105,17 @@ class Tags:
         return f"The tag \"{name}\" does not exist"
 
     def delete_tag(self, name, owner):
-        pass
+        if not self.tags['tags']:
+            return 'There are no tags'
+
+        if name in self.tags['tags']:
+            if self.tags['tags'][name]['owner'] == owner:
+                del self.tags['tags'][name]
+                self.save_tags()
+                return f"The tag \"{name}\" has been deleted"
+            return f"You are not the owner of the tag \"{name}\""
+
+        return f"The tag \"{name}\" does not exist"
 
     def list_tags(self):
         if not self.tags['tags']:
@@ -129,7 +139,11 @@ class Tags:
         pass
 
     def filter_tags(self, keyword):
-        pass
+        filtered_tags = list(filter(lambda x: keyword in x, self.tags['tags'].keys()))
+        filtered_tags = ', '.join(filtered_tags)
+        if not filtered_tags:
+            return f"No tags contain the word {keyword}"
+        return filtered_tags
 
     def find_owner(self, name):
         pass
