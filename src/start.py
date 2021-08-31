@@ -14,7 +14,7 @@ delim = '$'
 tags = {}
 
 
-def ping(**kwargs):
+async def ping(**kwargs):
     print(kwargs)
     return 'pong'
 
