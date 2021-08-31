@@ -55,12 +55,16 @@ async def on_ready():
 async def on_message(message):
     if message.author == client.user:
         return
-    # print(message)
+
     if message.content.startswith(delim):
         command = message.content[1:].split(" ")
         print(f"command: {command}")
         if command[0] in valid_commands:
+            # print(message)
             args = command[1:]
+            args.append(message.author.id)
+            if message.attachments:
+                args.append(message.attachments[0].url)
             args.append(message.channel.guild.id)
             command = command[0]
             result = valid_commands[command](args=args)

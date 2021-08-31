@@ -58,9 +58,8 @@ class Tags:
         """
         :return: dumps the group's tag to the disk
         """
-        tag_json = os.path.abspath(self.bot_path + "/../tags/" + self.group_id + '.json')
-        Utilities.log(f"{self.group_name}: saving: {tag_json}")
-        with atomic_write(tag_json, overwrite=True) as tag_file:
+        Utilities.log(f"{self.guild.name}: saving: {self.tags_json_file}")
+        with atomic_write(self.tags_json_file, overwrite=True) as tag_file:
             tag_file.write(json.dumps(self.tags, sort_keys=True, indent=2))
 
     def parse_commands(self, **kwargs):
@@ -68,7 +67,7 @@ class Tags:
         message = kwargs['args']
         command = message[0].rstrip()
         if command == "create":
-            pass
+            tag_result = self.create_tag(kwargs['args'][1], kwargs['args'][3],kwargs['args'][2])
         elif command == "delete":
             pass
         elif command == "list":
@@ -91,9 +90,13 @@ class Tags:
         return tag_result
 
     def create_tag(self, name, content, owner):
-        pass
+        if name in self.tags['tags']:
+            return f"The tag \"{name}\" already exists"
+        self.tags['tags'][name] = {'owner': owner, 'content': content}
+        self.save_tags()
+        return f"The tag \"{name}\" was created successfully"
 
-    def get_tag_content(message, mentions):
+    def get_tag_content(self, message, mentions):
         pass
 
     def post_tag(self, name):
