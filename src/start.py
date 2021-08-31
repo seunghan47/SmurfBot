@@ -62,9 +62,9 @@ async def on_message(message):
         if command[0] in valid_commands:
             # print(message)
             args = command[1:]
-            args.append(message.author.id)
             if message.attachments:
                 args.append(message.attachments[0].url)
+            args.append(message.author.id)
             args.append(message.channel.guild.id)
             command = command[0]
             result = valid_commands[command](args=args)
