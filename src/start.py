@@ -31,8 +31,10 @@ def yt_search(**kwargs):
     query = ' '.join(kwargs['args'][:-2])
     return ult.yt_search(query)
 
+
 def git(**kwargs):
     return Utilities.git()
+
 
 valid_commands = {
     'ping': ping,
