@@ -72,8 +72,6 @@ async def on_message(message):
             command = command[0]
             result = await valid_commands[command](args=args)
             await message.channel.send(result)
-        else:
-            await message.channel.send(f"{command} isn't a valid command")
 
 
 def main():
