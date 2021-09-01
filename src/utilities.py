@@ -19,7 +19,7 @@ class Utilities:
         return 'The commands are: tag, git, and avatar. Each one has their own help command except for git.'
 
     @staticmethod
-    def git():
+    async def git():
         """
         :return: a url of the git repo of the source code
         """
