@@ -130,13 +130,48 @@ class Tags:
         return all_tags
 
     async def edit_tag(self, name, owner, content):
-        pass
+        if not self.tags['tags']:
+            return 'There are no tags'
+
+        if name not in self.tags['tags']:
+            return f"The tag \"{name}\" does not exist"
+
+        if self.tags['tags'][name]['owner'] != owner:
+            return f"You are not the owner of the tag \"{name}\""
+
+        self.tags['tags'][name]['content'] = content
+        return f"The tag \"{name}\" has been edited"
 
     async def rename_tag(self, old_name, new_name, owner):
-        pass
+        if not self.tags['tags']:
+            return 'There are no tags'
+
+        if old_name not in self.tags['tags']:
+            return f"The tag \"{old_name}\" does not exist"
+
+        if new_name in self.tags['tags']:
+            return f"The tag \"{new_name}\" already exists"
+
+        if self.tags['tags'][old_name]['owner'] != owner:
+            return f"You are not the owner of the tag \"{old_name}\""
+
+        self.tags['tags'][new_name] = self.tags.pop(old_name)
+        self.save_tags()
+        return f"The tag \"{old_name}\" has been renamed to \"{new_name}\""
 
     async def gift_tag(self, name, owner, new_owner):
-        pass
+        if not self.tags['tags']:
+            return 'There are no tags'
+
+        if name not in self.tags['tags']:
+            return f"The tag \"{name}\" does not exist"
+
+        if self.tags['tags'][name]['owner'] != owner:
+            return f"You are not the owner of the tag \"{name}\""
+
+        self.tags['tags'][name]['owner'] = new_owner
+        self.save_tags()
+        return f"The tag \"{name}\" has been gifted to {new_owner}"
 
     async def filter_tags(self, keyword):
         filtered_tags = list(filter(lambda x: keyword in x, self.tags['tags'].keys()))
