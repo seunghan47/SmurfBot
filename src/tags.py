@@ -155,7 +155,7 @@ class Tags:
         if self.tags['tags'][old_name]['owner'] != owner:
             return f"You are not the owner of the tag \"{old_name}\""
 
-        self.tags['tags'][new_name] = self.tags.pop(old_name)
+        self.tags['tags'][new_name] = self.tags['tags'].pop(old_name)
         self.save_tags()
         return f"The tag \"{old_name}\" has been renamed to \"{new_name}\""
 
