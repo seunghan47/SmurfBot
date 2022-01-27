@@ -15,7 +15,7 @@ tags = {}
 
 
 async def ping(**kwargs):
-    print(kwargs)
+    Utilities.log(f"ping kwargs: {kwargs}")
     return 'pong'
 
 
@@ -32,6 +32,12 @@ def yt_search(**kwargs):
     return ult.yt_search(query)
 
 
+def mock(**kwargs):
+    Utilities.log(f"mock kwargs: {kwargs}")
+    message = ' '.join(kwargs['args'][:-2])
+    return Utilities.mock(message)
+
+
 def git(**kwargs):
     return Utilities.git()
 
@@ -40,7 +46,8 @@ valid_commands = {
     'ping': ping,
     'tag': parse_tag_commands,
     'yt': yt_search,
-    'git': git
+    'git': git,
+    'mock': mock
 }
 
 
