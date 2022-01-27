@@ -37,7 +37,7 @@ class Utilities:
         print(f"{t} - {message}")
 
     @staticmethod
-    def mock(message: str):
+    async def mock(message: str):
         """
         :return: message in the spongebob mocking format
         """
