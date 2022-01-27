@@ -1,5 +1,6 @@
 """contains functions not big enough to put into their own module"""
 from datetime import datetime
+
 try:
     import googleapiclient.discovery
 except ModuleNotFoundError:
@@ -8,6 +9,7 @@ except ModuleNotFoundError:
 
 class Utilities:
     """contains functions not big enough to put into their own module"""
+
     def __init__(self, yt_key=None):
         self.yt_key = yt_key
 
@@ -33,6 +35,32 @@ class Utilities:
         """
         t = datetime.now().strftime("%m/%d/%Y %H:%M:%S")
         print(f"{t} - {message}")
+
+    @staticmethod
+    def mock(message: str):
+        """
+        :return: message in the spongebob mocking format
+        """
+        message = message.lower().strip()
+        result = ''
+        for x in range(len(message)):
+            if message[x].isspace():
+                result = result + ' '
+                continue
+
+            if message[x - 1].isspace():
+                if x > 0 and result[-2].isupper():
+                    result = result + message[x]
+                else:
+                    result = result + message[x].upper()
+            else:
+                if x > 0 and result[-1].isupper():
+                    result = result + message[x]
+                else:
+                    result = result + message[x].upper()
+
+        return result
+        # return ''.join([(letter.upper() if index % 2 else letter) for index, letter in enumerate(message.lower())])
 
     def set_yt_key(self, key):
         self.yt_key = key
