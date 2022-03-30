@@ -4,6 +4,7 @@ import configparser
 import discord
 import json
 import os
+from remind import Remind
 from tags import Tags
 from utilities import Utilities
 
@@ -12,6 +13,7 @@ ult = Utilities()
 BOT_PATH = os.path.dirname(os.path.realpath(__file__))
 delim = '$'
 tags = {}
+reminds = {}
 
 
 async def ping(**kwargs):
@@ -24,6 +26,19 @@ def parse_tag_commands(**kwargs):
     tag = tags[kwargs['args'][-1]]
     args = kwargs['args'][:-1]
     return tag.parse_commands(args=args)
+
+
+def parse_remind_commands(**kwargs):
+    """
+    **kwargs ={'args': ['1d', 'clean', 'room', 112784387862450176, 224644073795878913]}
+    args[0] = time
+    args[1:-2] = message
+    args[-2] = user id
+    args[-1] = discord channel id
+    """
+    Utilities.log(f"parse_remind_commands kwargs: {kwargs}")
+    r = reminds[kwargs['args'][-1]]
+    return r.create_reminder(kwargs['args'][0], kwargs['args'][1:-2], kwargs['args'][-2])
 
 
 def yt_search(**kwargs):
@@ -47,7 +62,8 @@ valid_commands = {
     'tag': parse_tag_commands,
     'yt': yt_search,
     'git': git,
-    'mock': mock
+    'mock': mock,
+    'remind': parse_remind_commands
 }
 
 
@@ -59,8 +75,11 @@ async def on_ready():
         if str(channel.category) == 'Text Channels':
             print(f"Text Channel: {channel.guild} - {channel.guild.id} - {channel} - {channel.id}")
             tag_json_path = os.path.abspath(f"{BOT_PATH}/../tags")
+            reminders_json_path = os.path.abspath(f"{BOT_PATH}/../reminders")
             if channel.guild.id not in tags:
                 tags[channel.guild.id] = Tags(channel.guild, tag_json_path)
+            if channel.guild.id not in reminds:
+                reminds[channel.guild.id] = Remind(channel.guild, reminders_json_path)
     print('Initializing Done')
 
 
