@@ -12,11 +12,6 @@ from utilities import Utilities
 class Tags:
     """Handles all the tag related commands"""
     def __init__(self, guild, tags_json_path):
-        """
-        :param group_name: name of the group
-        :param group_id: id of the group
-        :param members: list of members of the group
-        """
         self.guild = guild
         self.tags_json_path = tags_json_path
         self.tags_json_file = f"{tags_json_path}/{guild.id}.json"
