@@ -16,68 +16,48 @@ tags = {}
 reminds = {}
 
 
-async def ping(**kwargs):
-    Utilities.log(f"ping kwargs: {kwargs}")
+async def ping(parameters):
+    Utilities.log(f"ping kwargs: {parameters}")
     return 'pong'
 
 
-def parse_tag_commands(**kwargs):
-    """
-    **kwargs = {'args': ['just', datetime.datetime(2022, 3, 30, 23, 36, 27, 131000), 112784387862450176]}
-        or
-    **kwargs = {'args': ['filter', 'just', datetime.datetime(2022, 3, 30, 23, 40, 14, 616000), 112784387862450176, 224644073795878913]}
-    """
-    Utilities.log(f"parse_tag_commands kwargs: {kwargs}")
+def parse_tag_commands(parameters):
+
+    Utilities.log(f"parse_tag_commands kwargs: {parameters}")
     # getting the Tag obj for that discord space
-    tag = tags[kwargs['args'][-1]]
-    args = kwargs['args'][:-1]
-    del args[-2]  # deleting the datetime obj since it isn't used
+    tag = tags[parameters['guild_id']]
+    args = parameters['message']
     return tag.parse_commands(args=args)
 
 
-def parse_remind_commands(**kwargs):
-    """
-    **kwargs = {'args': ['5m', 'clean', 'room',
-                        <bound method Client.fetch_user of <discord.client.Client object at 0x7fb1c84fffd0>>,
-                        datetime.datetime(2022, 3, 31, 0, 25, 49, 339000), 112784387862450176, 224644073795878913]
-            }
-    args[0] = time
-    args[1:-5] = message
-    args[-5] = discord function to get user name from user id
-    args[-4] = time message was created
-    args[-3] = user id
-    args[-2] = discord guild id
-    args[-1] = discord channel id
-    """
-    Utilities.log(f"parse_remind_commands kwargs: {kwargs}")
+def parse_remind_commands(parameters):
+
+    Utilities.log(f"parse_remind_commands parameters: {parameters}")
     # getting the Remind obj for that discord space
-    channel_id = kwargs['args'][-1]
-    guild_id = kwargs['args'][-2]
+    channel_id = parameters['channel_id']
+    guild_id = parameters['guild_id']
     r = reminds[guild_id]
-    time = kwargs['args'][0]
-    message = kwargs['args'][1:-5]
-    fetch_user_func = kwargs['args'][-5]
-    # can't convert the time given from discord to EST so I will
-    # just use datetime to get the time that way
-    # created_at = kwargs['args'][-3]
-    created_at = None
-    user = kwargs['args'][-3]
+    time = parameters['message'][0]
+    message = parameters['message'][1:]
+    fetch_user_func = parameters['fetch_user_func']
+    created_at = None  # can't convert the time given from discord to EST so I will just use datetime.now()
+    user = parameters['auther_id']
     return r.create_reminder(time, message, user, created_at, fetch_user_func, guild_id, channel_id)
 
 
-def yt_search(**kwargs):
-    Utilities.log(f"yt_search kwargs: {kwargs}")
-    query = ' '.join(kwargs['args'][:-2])
+def yt_search(parameters):
+    Utilities.log(f"yt_search kwargs: {parameters}")
+    query = ' '.join(parameters['message'])
     return ult.yt_search(query)
 
 
-def mock(**kwargs):
-    Utilities.log(f"mock kwargs: {kwargs}")
-    message = ' '.join(kwargs['args'][:-2])
+def mock(parameters):
+    Utilities.log(f"mock kwargs: {parameters}")
+    message = ' '.join(parameters['message'])
     return Utilities.mock(message)
 
 
-def git(**kwargs):
+def git(parameters):
     return Utilities.git()
 
 
@@ -116,18 +96,18 @@ async def on_message(message):
         command = message.content[1:].split(" ")
         print(f"command: {command}")
         if command[0] in valid_commands:
-            # print(message)
-            args = command[1:]
+            parameters = {'command': command[0], 'message': command[1:]}
             if message.attachments:
-                args.append(message.attachments[0].url)
-            if (command[0] == 'remind') or (command[0] == 'tag' and args[0] == 'owner'):
-                args.append(client.fetch_user)
-            args.append(message.created_at)
-            args.append(message.author.id)
-            args.append(message.channel.guild.id)
-            args.append(message.channel.id)
+                parameters['attachment'] = message.attachments[0].url
+            if (parameters['command'] == 'remind') or (parameters['command'] == 'tag' and parameters['message'][0] == 'owner'):
+                parameters['fetch_user_func'] = client.fetch_user
+            parameters['created_at'] = message.created_at
+            parameters['auther_id'] = message.author.id
+            parameters['guild_id'] = message.channel.guild.id
+            parameters['channel_id'] = message.channel.id
+
             command = command[0]
-            result = await valid_commands[command](args=args)
+            result = await valid_commands[command](parameters)
             await message.channel.send(result)
 
 
