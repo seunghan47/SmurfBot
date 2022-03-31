@@ -22,7 +22,6 @@ async def ping(parameters):
 
 
 def parse_tag_commands(parameters):
-
     Utilities.log(f"parse_tag_commands parameters: {parameters}")
     # getting the Tag obj for that discord space
     tag = tags[parameters['guild_id']]
@@ -30,7 +29,6 @@ def parse_tag_commands(parameters):
 
 
 def parse_remind_commands(parameters):
-
     Utilities.log(f"parse_remind_commands parameters: {parameters}")
     channel_id = parameters['channel_id']
     guild_id = parameters['guild_id']
