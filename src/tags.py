@@ -1,8 +1,6 @@
 """Handles all the tag related commands"""
 import json
 import os
-from functools import reduce
-from itertools import zip_longest
 
 import discord
 from atomicwrites import atomic_write
@@ -59,35 +57,41 @@ class Tags:
         with atomic_write(self.tags_json_file, overwrite=True) as tag_file:
             tag_file.write(json.dumps(self.tags, sort_keys=True, indent=2))
 
-    def parse_commands(self, **kwargs):
-        print(f"tags parse_commands kwargs: {kwargs}")
-        message = kwargs['args']
-        command = message[0].rstrip()
+    def parse_commands(self, parameters):
+        print(f"tags parse_commands parameters: {parameters}")
+        command = parameters['message'][0].rstrip()
+        message = parameters['message'][1:]
         tag_result = ''
-        if command == "create":
-            tag_result = self.create_tag(kwargs['args'][1], ' '.join(kwargs['args'][2: -1]), kwargs['args'][-1])
-        elif command == "delete":
-            tag_result = self.delete_tag(kwargs['args'][1], kwargs['args'][2])
-        elif command == "list":
-            tag_result = self.list_tags()
-        elif command == "help":
-            tag_result = self.post_help()
-        elif command == "edit":
-            pass
-        elif command == "rename":
-            pass
-        elif command == "gift":
-            pass
-        elif command == "owner":
-            tag_result = self.find_owner(kwargs['args'][1], kwargs['args'][2])
-        elif command == "filter":
-            tag_result = self.filter_tags(kwargs['args'][1])
-        else:
-            tag_result = self.post_tag(command.strip())
+        match command:
+            case 'create':
+                tag_result = self.create_tag(message[0], {'message': ' '.join(message[2: -1]), 'attachment': parameters['attachment']}, parameters['author_id'])
+            case 'delete':
+                tag_result = self.delete_tag(message[0], parameters['author_id'])
+            case 'list':
+                tag_result = self.list_tags()
+            case 'help':
+                tag_result = self.post_help()
+            case 'edit':
+                pass
+            case 'rename':
+                pass
+            case 'gift':
+                pass
+            case 'owner':
+                tag_result = self.find_owner(message[0], parameters['fetch_user_func'])
+            case 'filter':
+                tag_result = self.filter_tags(message[0])
+            case _:
+                tag_result = self.post_tag(command.strip())
 
         return tag_result
 
     async def create_tag(self, name, content, owner):
+        if content['attachment'] is None:
+            content = content['message']
+        else:
+            content = content['attachment']
+
         if name in self.tags['tags']:
             return f"The tag \"{name}\" already exists"
         self.tags['tags'][name] = {'owner': owner, 'content': content}
