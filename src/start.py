@@ -17,13 +17,13 @@ reminds = {}
 
 
 async def ping(parameters):
-    Utilities.log(f"ping kwargs: {parameters}")
+    Utilities.log(f"ping parameters: {parameters}")
     return 'pong'
 
 
 def parse_tag_commands(parameters):
 
-    Utilities.log(f"parse_tag_commands kwargs: {parameters}")
+    Utilities.log(f"parse_tag_commands parameters: {parameters}")
     # getting the Tag obj for that discord space
     tag = tags[parameters['guild_id']]
     args = parameters['message']
@@ -46,13 +46,13 @@ def parse_remind_commands(parameters):
 
 
 def yt_search(parameters):
-    Utilities.log(f"yt_search kwargs: {parameters}")
+    Utilities.log(f"yt_search parameters: {parameters}")
     query = ' '.join(parameters['message'])
     return ult.yt_search(query)
 
 
 def mock(parameters):
-    Utilities.log(f"mock kwargs: {parameters}")
+    Utilities.log(f"mock parameters: {parameters}")
     message = ' '.join(parameters['message'])
     return Utilities.mock(message)
 
