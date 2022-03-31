@@ -26,22 +26,21 @@ def parse_tag_commands(parameters):
     Utilities.log(f"parse_tag_commands parameters: {parameters}")
     # getting the Tag obj for that discord space
     tag = tags[parameters['guild_id']]
-    args = parameters['message']
-    return tag.parse_commands(args=args)
+    return tag.parse_commands(parameters)
 
 
 def parse_remind_commands(parameters):
 
     Utilities.log(f"parse_remind_commands parameters: {parameters}")
-    # getting the Remind obj for that discord space
     channel_id = parameters['channel_id']
     guild_id = parameters['guild_id']
+    # getting the Remind obj for that discord space
     r = reminds[guild_id]
     time = parameters['message'][0]
     message = parameters['message'][1:]
     fetch_user_func = parameters['fetch_user_func']
     created_at = None  # can't convert the time given from discord to EST so I will just use datetime.now()
-    user = parameters['auther_id']
+    user = parameters['author_id']
     return r.create_reminder(time, message, user, created_at, fetch_user_func, guild_id, channel_id)
 
 
@@ -96,13 +95,13 @@ async def on_message(message):
         command = message.content[1:].split(" ")
         print(f"command: {command}")
         if command[0] in valid_commands:
-            parameters = {'command': command[0], 'message': command[1:]}
+            parameters = {'command': command[0], 'message': command[1:], 'attachment': None}
             if message.attachments:
                 parameters['attachment'] = message.attachments[0].url
             if (parameters['command'] == 'remind') or (parameters['command'] == 'tag' and parameters['message'][0] == 'owner'):
                 parameters['fetch_user_func'] = client.fetch_user
             parameters['created_at'] = message.created_at
-            parameters['auther_id'] = message.author.id
+            parameters['author_id'] = message.author.id
             parameters['guild_id'] = message.channel.guild.id
             parameters['channel_id'] = message.channel.id
 
