@@ -42,24 +42,27 @@ def parse_remind_commands(**kwargs):
                         datetime.datetime(2022, 3, 31, 0, 25, 49, 339000), 112784387862450176, 224644073795878913]
             }
     args[0] = time
-    args[1:-4] = message
-    args[-4] = discord function to get user name from user id
-    args[-3] = time message was created
-    args[-2] = user id
+    args[1:-5] = message
+    args[-5] = discord function to get user name from user id
+    args[-4] = time message was created
+    args[-3] = user id
+    args[-2] = discord guild id
     args[-1] = discord channel id
     """
     Utilities.log(f"parse_remind_commands kwargs: {kwargs}")
     # getting the Remind obj for that discord space
-    r = reminds[kwargs['args'][-1]]
+    channel_id = kwargs['args'][-1]
+    guild_id = kwargs['args'][-2]
+    r = reminds[guild_id]
     time = kwargs['args'][0]
-    message = kwargs['args'][1:-4]
-    fetch_user_func = kwargs['args'][-4]
+    message = kwargs['args'][1:-5]
+    fetch_user_func = kwargs['args'][-5]
     # can't convert the time given from discord to EST so I will
     # just use datetime to get the time that way
     # created_at = kwargs['args'][-3]
     created_at = None
-    user = kwargs['args'][-2]
-    return r.create_reminder(time, message, user, created_at, fetch_user_func)
+    user = kwargs['args'][-3]
+    return r.create_reminder(time, message, user, created_at, fetch_user_func, guild_id, channel_id)
 
 
 def yt_search(**kwargs):
@@ -122,6 +125,7 @@ async def on_message(message):
             args.append(message.created_at)
             args.append(message.author.id)
             args.append(message.channel.guild.id)
+            args.append(message.channel.id)
             command = command[0]
             result = await valid_commands[command](args=args)
             await message.channel.send(result)
@@ -142,4 +146,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

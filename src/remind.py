@@ -15,7 +15,6 @@ class Remind:
         self.reminders_json_path = reminders_json_path
         self.reminders_json_file = f"{reminders_json_path}/{guild.id}.json"
         self.reminders = self.load_reminders()
-        self.channel = client.get_channel(self.guild.id)
         self.date_format = '%Y-%m-%dT%H:%M:%S'
         self.loop = client.loop
         asyncio.run_coroutine_threadsafe(self.parse_reminders(), self.loop)
@@ -74,17 +73,18 @@ class Remind:
 
     async def parse_reminder(self, reminder):
         current_datetime = datetime.now(pytz.timezone('US/Eastern'))
-        planned_execution_date = datetime.strptime(reminder['created_at'], self.date_format) + timedelta(seconds=remainder['time'])
+        planned_execution_date = datetime.strptime(reminder['created_at'], self.date_format) + timedelta(seconds=reminder['time'])
 
         if planned_execution_date > current_datetime:
             time_difference = (planned_execution_date - current_datetime).total_seconds()
-            await self.send_message(reminder['message'], reminder['user_id'], time_difference)
+            await self.send_message(reminder['message'], reminder['user_id'], time_difference, reminder['channel_id'])
 
-    async def send_message(self, message, user_id, seconds):
+    async def send_message(self, message, user_id, seconds, channel_id):
         await asyncio.sleep(seconds)
-        await self.channel.send(f"<@{user_id}> reminder: {message}")
+        channel = self.guild.get_channel(channel_id)
+        await channel.send(f"<@{user_id}> reminder: {message}")
 
-    async def create_reminder(self, time, message, user_id, created_at, fetch_user):
+    async def create_reminder(self, time, message, user_id, created_at, fetch_user, guild_id, channel_id):
         user = await fetch_user(user_id)
         time = self.parse_time(time)
         message = " ".join(message)
@@ -94,9 +94,11 @@ class Remind:
             'name': user.name,
             'time': time,
             'message': message,
-            'created_at': created_at.strftime(self.date_format)
+            'created_at': created_at.strftime(self.date_format),
+            'guild_id': guild_id,
+            'channel_id': channel_id
         })
         self.save_reminders()
         execution_time = (created_at + timedelta(seconds=time)).strftime('%m/%d/%Y @ %I:%M:%S%p')
-        asyncio.run_coroutine_threadsafe(self.send_message(message, user_id, time), self.loop)
+        asyncio.run_coroutine_threadsafe(self.send_message(message, user_id, time, channel_id), self.loop)
         return f"Created reminder for {user.name} to go off at {execution_time}"
