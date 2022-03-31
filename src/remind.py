@@ -79,12 +79,7 @@ class Remind:
             reminders_file.write(json.dumps(self.reminders, sort_keys=True, indent=2))
 
     def clean_reminders(self):
-        for index, reminder in enumerate(self.reminders['reminders']):
-            print(f"index: {index}")
-            print(f"reminder: {reminder}")
-            if has_datetime_passed(reminder['created_at'], reminder['time']):
-                print(f"deleting index {index} -> {reminder}")
-                del self.reminders['reminders'][index]
+        self.reminders['reminders'] = list(filter(lambda x: has_datetime_passed(x['created_at'], x['time'])['result'] is False, self.reminders['reminders']))
         self.save_reminders()
 
     async def parse_reminders(self):
