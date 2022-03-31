@@ -22,23 +22,44 @@ async def ping(**kwargs):
 
 
 def parse_tag_commands(**kwargs):
+    """
+    **kwargs = {'args': ['just', datetime.datetime(2022, 3, 30, 23, 36, 27, 131000), 112784387862450176]}
+        or
+    **kwargs = {'args': ['filter', 'just', datetime.datetime(2022, 3, 30, 23, 40, 14, 616000), 112784387862450176, 224644073795878913]}
+    """
     Utilities.log(f"parse_tag_commands kwargs: {kwargs}")
+    # getting the Tag obj for that discord space
     tag = tags[kwargs['args'][-1]]
     args = kwargs['args'][:-1]
+    del args[-2]  # deleting the datetime obj since it isn't used
     return tag.parse_commands(args=args)
 
 
 def parse_remind_commands(**kwargs):
     """
-    **kwargs ={'args': ['1d', 'clean', 'room', 112784387862450176, 224644073795878913]}
+    **kwargs = {'args': ['5m', 'clean', 'room',
+                        <bound method Client.fetch_user of <discord.client.Client object at 0x7fb1c84fffd0>>,
+                        datetime.datetime(2022, 3, 31, 0, 25, 49, 339000), 112784387862450176, 224644073795878913]
+            }
     args[0] = time
-    args[1:-2] = message
+    args[1:-4] = message
+    args[-4] = discord function to get user name from user id
+    args[-3] = time message was created
     args[-2] = user id
     args[-1] = discord channel id
     """
     Utilities.log(f"parse_remind_commands kwargs: {kwargs}")
+    # getting the Remind obj for that discord space
     r = reminds[kwargs['args'][-1]]
-    return r.create_reminder(kwargs['args'][0], kwargs['args'][1:-2], kwargs['args'][-2])
+    time = kwargs['args'][0]
+    message = kwargs['args'][1:-4]
+    fetch_user_func = kwargs['args'][-4]
+    # can't convert the time given from discord to EST so I will
+    # just use datetime to get the time that way
+    # created_at = kwargs['args'][-3]
+    created_at = None
+    user = kwargs['args'][-2]
+    return r.create_reminder(time, message, user, created_at, fetch_user_func)
 
 
 def yt_search(**kwargs):
@@ -79,7 +100,7 @@ async def on_ready():
             if channel.guild.id not in tags:
                 tags[channel.guild.id] = Tags(channel.guild, tag_json_path)
             if channel.guild.id not in reminds:
-                reminds[channel.guild.id] = Remind(channel.guild, reminders_json_path)
+                reminds[channel.guild.id] = Remind(channel.guild, reminders_json_path, client)
     print('Initializing Done')
 
 
@@ -96,8 +117,9 @@ async def on_message(message):
             args = command[1:]
             if message.attachments:
                 args.append(message.attachments[0].url)
-            if command[0] == 'tag' and args[0] == 'owner':
+            if (command[0] == 'remind') or (command[0] == 'tag' and args[0] == 'owner'):
                 args.append(client.fetch_user)
+            args.append(message.created_at)
             args.append(message.author.id)
             args.append(message.channel.guild.id)
             command = command[0]
