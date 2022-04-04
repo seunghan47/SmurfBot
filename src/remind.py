@@ -29,11 +29,15 @@ def parse_time(time):
 
 
 def add_time_to_date(date, seconds):
-    return (datetime.strptime(date, date_format) + timedelta(seconds=seconds)).astimezone(pytz.timezone('US/Eastern'))
+    if type(date) == str:
+        date = datetime.strptime(date, date_format)
+    return (date + timedelta(seconds=seconds)).astimezone(pytz.timezone('US/Eastern'))
 
 
 def has_datetime_passed(planned_execution_date):
     current_datetime = datetime.now(pytz.timezone('US/Eastern'))
+    if type(planned_execution_date) is str:
+        planned_execution_date = datetime.strptime(planned_execution_date, date_format).astimezone(pytz.timezone('US/Eastern'))
     if planned_execution_date > current_datetime:
         return {'result': False, 'seconds_until_execution': (planned_execution_date - current_datetime).total_seconds()}
     return {'result': True, 'seconds_until_execution': -1}
@@ -41,7 +45,6 @@ def has_datetime_passed(planned_execution_date):
 
 class Remind:
     def __init__(self, guild, reminders_json_path, client):
-
         self.guild = guild
         self.reminders_json_path = reminders_json_path
         self.reminders_json_file = f"{reminders_json_path}/{guild.id}.json"
@@ -72,7 +75,6 @@ class Remind:
         self.create_json()
         Utilities.log(f"{self.guild.name}: loading: {self.reminders_json_file}")
         with open(self.reminders_json_file, 'r') as reminders:
-            # print(f"{self.guild.name} reminders contents: {json.load(reminders)}")
             return json.load(reminders)
 
     def save_reminders(self):
@@ -91,7 +93,10 @@ class Remind:
         self.clean_reminders()
         message = ''
         for reminder in self.reminders['reminders']:
-            message = f"{message}\nCreated by: {reminder.name}\nReminder date: {reminder.execution_time}\nReminder message: {reminder.message}\n\n"
+            print(reminder)
+            message = f"{message}\nCreated by: {reminder['name']}\nReminder date: {reminder['execution_time']}\nReminder message: {reminder['message']}\n"
+        if message == '':
+            return 'No active reminds were found'
         return message
 
     async def parse_reminders(self):
@@ -132,7 +137,7 @@ class Remind:
             'seconds': time,
             'message': message,
             'created_at': created_at.strftime(date_format),
-            'execution_time': add_time_to_date(created_at, time),
+            'execution_time': add_time_to_date(created_at, time).strftime(date_format),
             'guild_id': guild_id,
             'channel_id': channel_id
         })
