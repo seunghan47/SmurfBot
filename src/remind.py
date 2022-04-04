@@ -32,9 +32,8 @@ def add_time_to_date(date, seconds):
     return (datetime.strptime(date, date_format) + timedelta(seconds=seconds)).astimezone(pytz.timezone('US/Eastern'))
 
 
-def has_datetime_passed(creation_datetime, seconds):
+def has_datetime_passed(planned_execution_date):
     current_datetime = datetime.now(pytz.timezone('US/Eastern'))
-    planned_execution_date = add_time_to_date(creation_datetime, seconds)
     if planned_execution_date > current_datetime:
         return {'result': False, 'seconds_until_execution': (planned_execution_date - current_datetime).total_seconds()}
     return {'result': True, 'seconds_until_execution': -1}
@@ -85,7 +84,7 @@ class Remind:
             reminders_file.write(json.dumps(self.reminders, sort_keys=True, indent=2))
 
     def clean_reminders(self):
-        self.reminders['reminders'] = list(filter(lambda x: has_datetime_passed(x['created_at'], x['seconds'])['result'] is False, self.reminders['reminders']))
+        self.reminders['reminders'] = list(filter(lambda x: has_datetime_passed(x['execution_time'])['result'] is False, self.reminders['reminders']))
         self.save_reminders()
 
     def list_reminders(self):
@@ -100,7 +99,7 @@ class Remind:
             await self.parse_reminder(reminder)
 
     async def parse_reminder(self, reminder):
-        r = has_datetime_passed(reminder['created_at'], reminder['seconds'])
+        r = has_datetime_passed(reminder['execution_time'])
         if not r['result']:
             self.create_timer(reminder['message'], reminder['user_id'], reminder['name'], r['seconds_until_execution'], reminder['channel_id'])
 
