@@ -102,6 +102,8 @@ class Remind:
 
     async def create_reminder(self, time, message, user_id, created_at, fetch_user, guild_id, channel_id):
         user = await fetch_user(user_id)
+        if time.lower() == 'help':
+            return 'Format: $remind [amount of time] [message]. Example: $remind 1h check laundry\nSupport units: s (seconds), m (minutes), h (hours), or d (days).'
         time = parse_time(time)
         if time is None:
             return f"Unsupported unit of time. Please use s (seconds), m (minutes), h (hours), or d (days)"
