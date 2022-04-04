@@ -7,6 +7,9 @@ from atomicwrites import atomic_write
 from datetime import datetime, timedelta
 from utilities import Utilities
 
+date_format = '%Y-%m-%dT%H:%M:%S'
+human_date_format = '%m/%d/%Y @ %I:%M:%S%p'
+
 
 def parse_time(time):
     unit = time[-1]
@@ -25,9 +28,13 @@ def parse_time(time):
     return amount
 
 
+def add_time_to_date(date, seconds):
+    return (datetime.strptime(date, date_format) + timedelta(seconds=seconds)).astimezone(pytz.timezone('US/Eastern'))
+
+
 def has_datetime_passed(creation_datetime, seconds):
     current_datetime = datetime.now(pytz.timezone('US/Eastern'))
-    planned_execution_date = (datetime.strptime(creation_datetime, '%Y-%m-%dT%H:%M:%S') + timedelta(seconds=seconds)).astimezone(pytz.timezone('US/Eastern'))
+    planned_execution_date = add_time_to_date(creation_datetime, seconds)
     if planned_execution_date > current_datetime:
         return {'result': False, 'seconds_until_execution': (planned_execution_date - current_datetime).total_seconds()}
     return {'result': True, 'seconds_until_execution': -1}
@@ -40,7 +47,6 @@ class Remind:
         self.reminders_json_path = reminders_json_path
         self.reminders_json_file = f"{reminders_json_path}/{guild.id}.json"
         self.reminders = self.load_reminders()
-        self.date_format = '%Y-%m-%dT%H:%M:%S'
         self.loop = client.loop
         self.clean_reminders()
         asyncio.run_coroutine_threadsafe(self.parse_reminders(), self.loop)
@@ -79,15 +85,22 @@ class Remind:
             reminders_file.write(json.dumps(self.reminders, sort_keys=True, indent=2))
 
     def clean_reminders(self):
-        self.reminders['reminders'] = list(filter(lambda x: has_datetime_passed(x['created_at'], x['time'])['result'] is False, self.reminders['reminders']))
+        self.reminders['reminders'] = list(filter(lambda x: has_datetime_passed(x['created_at'], x['seconds'])['result'] is False, self.reminders['reminders']))
         self.save_reminders()
+
+    def list_reminders(self):
+        self.clean_reminders()
+        message = ''
+        for reminder in self.reminders['reminders']:
+            message = f"{message}\nCreated by: {reminder.name}\nReminder date: {reminder.execution_time}\nReminder message: {reminder.message}\n\n"
+        return message
 
     async def parse_reminders(self):
         for reminder in self.reminders['reminders']:
             await self.parse_reminder(reminder)
 
     async def parse_reminder(self, reminder):
-        r = has_datetime_passed(reminder['created_at'], reminder['time'])
+        r = has_datetime_passed(reminder['created_at'], reminder['seconds'])
         if not r['result']:
             self.create_timer(reminder['message'], reminder['user_id'], reminder['name'], r['seconds_until_execution'], reminder['channel_id'])
 
@@ -102,9 +115,14 @@ class Remind:
 
     async def create_reminder(self, time, message, user_id, created_at, fetch_user, guild_id, channel_id):
         user = await fetch_user(user_id)
-        if time.lower() == 'help':
-            return 'Format: $remind [amount of time] [message]. Example: $remind 1h check laundry\nSupport units: s (seconds), m (minutes), h (hours), or d (days).'
-        time = parse_time(time)
+        match time:
+            case 'help':
+                return 'Format: $remind [amount of time] [message]. Example: $remind 1h check laundry\nSupport units: '\
+                       's (seconds), m (minutes), h (hours), or d (days). '
+            case 'list':
+                return self.list_reminders()
+            case _:
+                time = parse_time(time)
         if time is None:
             return f"Unsupported unit of time. Please use s (seconds), m (minutes), h (hours), or d (days)"
         message = " ".join(message)
@@ -112,13 +130,14 @@ class Remind:
         self.reminders['reminders'].append({
             'user_id': user_id,
             'name': user.name,
-            'time': time,
+            'seconds': time,
             'message': message,
-            'created_at': created_at.strftime(self.date_format),
+            'created_at': created_at.strftime(date_format),
+            'execution_time': add_time_to_date(created_at, time),
             'guild_id': guild_id,
             'channel_id': channel_id
         })
         self.save_reminders()
-        execution_time = (created_at + timedelta(seconds=time)).strftime('%m/%d/%Y @ %I:%M:%S%p')
+        execution_time = (created_at + timedelta(seconds=time)).strftime(human_date_format)
         self.create_timer(message, user_id, user.name, time, channel_id)
         return f"Created reminder for {user.name} to go off at {execution_time}"
