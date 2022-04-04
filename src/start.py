@@ -35,6 +35,8 @@ def parse_remind_commands(parameters):
     # getting the Remind obj for that discord space
     r = reminds[guild_id]
     time = parameters['message'][0]
+    if time.lower() == 'help':
+        return 'Format: $remind [amount of time] [message]. Example: $remind 1h check laundry\nSupport units: s (seconds), m (minutes), h (hours), or d (days).'
     message = parameters['message'][1:]
     fetch_user_func = parameters['fetch_user_func']
     created_at = None  # can't convert the time given from discord to EST so I will just use datetime.now()
