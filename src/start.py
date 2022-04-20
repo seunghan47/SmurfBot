@@ -4,6 +4,7 @@ import configparser
 import discord
 import json
 import os
+from datetime import datetime
 from remind import Remind
 from tags import Tags
 from utilities import Utilities
@@ -70,18 +71,18 @@ valid_commands = {
 
 @client.event
 async def on_ready():
-    print(f"We have logged in as {client.user}\n")
-    print("server - server id - channel - channel id\n=========================================")
+    print(f"{datetime.now().strftime('%m/%d/%Y %H:%M:%S')} - We have logged in as {client.user}\n")
+    print(f"{datetime.now().strftime('%m/%d/%Y %H:%M:%S')} - server - server id - channel - channel id\n=========================================")
     for channel in client.get_all_channels():
         if str(channel.category) == 'Text Channels':
-            print(f"Text Channel: {channel.guild} - {channel.guild.id} - {channel} - {channel.id}")
+            print(f"{datetime.now().strftime('%m/%d/%Y %H:%M:%S')} - Text Channel: {channel.guild} - {channel.guild.id} - {channel} - {channel.id}")
             tag_json_path = os.path.abspath(f"{BOT_PATH}/../tags")
             reminders_json_path = os.path.abspath(f"{BOT_PATH}/../reminders")
             if channel.guild.id not in tags:
                 tags[channel.guild.id] = Tags(channel.guild, tag_json_path)
             if channel.guild.id not in reminds:
                 reminds[channel.guild.id] = Remind(channel.guild, reminders_json_path, client)
-    print('Initializing Done')
+    print(f" {datetime.now().strftime('%m/%d/%Y %H:%M:%S')} - Initializing Done")
 
 
 @client.event
@@ -91,7 +92,7 @@ async def on_message(message):
 
     if message.content.startswith(delim):
         command = message.content[1:].split(" ")
-        print(f"command: {command}")
+        print(f"{datetime.now().strftime('%m/%d/%Y %H:%M:%S')} - command: {command}")
         if command[0] in valid_commands:
             parameters = {'command': command[0], 'message': command[1:], 'attachment': None}
             if message.attachments:
