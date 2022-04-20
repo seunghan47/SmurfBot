@@ -102,6 +102,7 @@ class Remind:
 
     async def parse_reminders(self):
         Utilities.log(f"{self.guild.name}: parse_reminders()")
+        Utilities.log(f"{self.guild.name}: {self.reminders}")
         for reminder in self.reminders['reminders']:
             await self.parse_reminder(reminder)
 
