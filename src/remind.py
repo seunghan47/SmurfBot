@@ -86,6 +86,7 @@ class Remind:
             reminders_file.write(json.dumps(self.reminders, sort_keys=True, indent=2))
 
     def clean_reminders(self):
+        Utilities.log(f"{self.guild.name}: cleaning: {self.reminders_json_file}")
         self.reminders['reminders'] = list(filter(lambda x: has_datetime_passed(x['execution_time'])['result'] is False, self.reminders['reminders']))
         self.save_reminders()
 
@@ -100,13 +101,17 @@ class Remind:
         return message
 
     async def parse_reminders(self):
+        Utilities.log(f"{self.guild.name}: parse_reminders()")
         for reminder in self.reminders['reminders']:
             await self.parse_reminder(reminder)
 
     async def parse_reminder(self, reminder):
+        Utilities.log(f"{self.guild.name}: parse_reminder()")
         r = has_datetime_passed(reminder['execution_time'])
         if not r['result']:
             self.create_timer(reminder['message'], reminder['user_id'], reminder['name'], r['seconds_until_execution'], reminder['channel_id'])
+        else:
+            Utilities.log(f"{self.guild.name}: parse_reminder() - reminder for {reminder['name']} that says {reminder['message']} alredy expired")
 
     def create_timer(self, message, user_id, user_name, time, channel_id):
         asyncio.run_coroutine_threadsafe(self.send_message(message, user_id, time, channel_id), self.loop)
