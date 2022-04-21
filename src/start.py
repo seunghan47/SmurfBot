@@ -21,6 +21,10 @@ async def ping(parameters):
     return 'pong'
 
 
+async def boob(parameters):
+    return 'https://cdn.discordapp.com/attachments/224644073795878913/966783811641827438/timetostop.gif'
+
+
 def parse_tag_commands(parameters):
     Utilities.log(f"parse_tag_commands parameters: {parameters}")
     # getting the Tag obj for that discord space
@@ -64,7 +68,8 @@ valid_commands = {
     'yt': yt_search,
     'git': git,
     'mock': mock,
-    'remind': parse_remind_commands
+    'remind': parse_remind_commands,
+    'boob': boob
 }
 
 

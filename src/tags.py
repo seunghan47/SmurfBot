@@ -67,7 +67,6 @@ class Tags:
                 name = message[0]
                 content = {'message': ' '.join(message[1:]), 'attachment': parameters['attachment']}
                 owner = parameters['author_id']
-                Utilities.log(f"parse_commands() - command: {command}, message: {message}, name: {name}, content:{content}, owner: {owner}")
                 tag_result = self.create_tag(name, content, owner)
             case 'delete':
                 tag_result = self.delete_tag(message[0], parameters['author_id'])
@@ -91,12 +90,10 @@ class Tags:
         return tag_result
 
     async def create_tag(self, name, content, owner):
-        Utilities.log(f"1 - name: {name}, content: {content}, owner: {owner}")
         if content['attachment'] is None:
             content = content['message']
         else:
             content = content['attachment']
-        Utilities.log(f"2 - name: {name}, content: {content}, owner: {owner}")
         if name in self.tags['tags']:
             return f"The tag \"{name}\" already exists"
         self.tags['tags'][name] = {'owner': owner, 'content': content}
