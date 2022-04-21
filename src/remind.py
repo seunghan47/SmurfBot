@@ -1,10 +1,9 @@
 import asyncio
 import json
 import os
-import pytz
 
 from atomicwrites import atomic_write
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from utilities import Utilities
 
 date_format = '%Y-%m-%dT%H:%M:%S'
@@ -30,18 +29,19 @@ def parse_time(time):
 
 def add_time_to_date(date, seconds):
     if type(date) == str:
-        date = datetime.strptime(date, date_format)
-    return (date + timedelta(seconds=seconds)).astimezone(pytz.timezone('US/Eastern'))
+        date = datetime.strptime(date, date_format).replace(tzinfo=timezone.utc)
+    return date + timedelta(seconds=seconds)
 
 
 def has_datetime_passed(planned_execution_date):
-    current_datetime = datetime.now(pytz.timezone('US/Eastern'))
+    current_datetime = datetime.now(timezone.utc)
     if type(planned_execution_date) is str:
-        planned_execution_date = datetime.strptime(planned_execution_date, date_format).replace(tzinfo=pytz.timezone('US/Eastern'))
-    Utilities.log(f"has_datetime_passed() - current_datetime: ({type(current_datetime)}) {current_datetime}")
-    Utilities.log(f"has_datetime_passed() - planned_execution_date: ({type(planned_execution_date)}) {planned_execution_date}")
+        planned_execution_date = datetime.strptime(planned_execution_date, date_format).replace(tzinfo=timezone.utc)
+    Utilities.log(f"has_datetime_passed() - current_datetime: ({type(current_datetime)}) {current_datetime} {current_datetime.tzinfo}")
+    Utilities.log(f"has_datetime_passed() - planned_execution_date: ({type(planned_execution_date)}) {planned_execution_date} {planned_execution_date.tzinfo}")
     if planned_execution_date > current_datetime:
-        Utilities.log(f"has_datetime_passed() - seconds_until_executionL {(planned_execution_date - current_datetime).total_seconds()}")
+        Utilities.log(f"has_datetime_passed() - seconds_until_execution: {(planned_execution_date - current_datetime)}")
+        Utilities.log(f"has_datetime_passed() - seconds_until_execution.total_seconds(): {(planned_execution_date - current_datetime).total_seconds()}")
         return {'result': False, 'seconds_until_execution': (planned_execution_date - current_datetime).total_seconds()}
     return {'result': True, 'seconds_until_execution': -1}
 
@@ -97,7 +97,6 @@ class Remind:
         self.clean_reminders()
         message = ''
         for reminder in self.reminders['reminders']:
-            print(reminder)
             message = f"{message}\nCreated by: {reminder['name']}\nReminder date: {reminder['execution_time']}\nReminder message: {reminder['message']}\n"
         if message == '':
             return 'No active reminds were found'
@@ -126,31 +125,30 @@ class Remind:
         channel = self.guild.get_channel(channel_id)
         await channel.send(f"<@{user_id}> reminder: {message}")
 
-    async def create_reminder(self, time, message, user_id, created_at, fetch_user, guild_id, channel_id):
+    async def create_reminder(self, seconds, message, user_id, created_at, fetch_user, guild_id, channel_id):
         user = await fetch_user(user_id)
-        match time:
+        match seconds:
             case 'help':
                 return 'Format: $remind [amount of time] [message]. Example: $remind 1h check laundry\nSupport units: '\
                        's (seconds), m (minutes), h (hours), or d (days). '
             case 'list':
                 return self.list_reminders()
             case _:
-                time = parse_time(time)
-        if time is None:
+                seconds = parse_time(seconds)
+        if seconds is None:
             return f"Unsupported unit of time. Please use s (seconds), m (minutes), h (hours), or d (days)"
         message = " ".join(message)
-        created_at = datetime.now(pytz.timezone('US/Eastern'))
+        created_at = datetime.now(timezone.utc)
         self.reminders['reminders'].append({
             'user_id': user_id,
             'name': user.name,
-            'seconds': time,
             'message': message,
             'created_at': created_at.strftime(date_format),
-            'execution_time': add_time_to_date(created_at, time).strftime(date_format),
+            'execution_time': add_time_to_date(created_at, seconds).strftime(date_format),
             'guild_id': guild_id,
             'channel_id': channel_id
         })
         self.save_reminders()
-        execution_time = (created_at + timedelta(seconds=time)).strftime(human_date_format)
-        self.create_timer(message, user_id, user.name, time, channel_id)
+        execution_time = (created_at + timedelta(seconds=seconds)).strftime(human_date_format)
+        self.create_timer(message, user_id, user.name, seconds, channel_id)
         return f"Created reminder for {user.name} to go off at {execution_time}"
