@@ -1,4 +1,5 @@
 """contains functions not big enough to put into their own module"""
+import pytz
 from datetime import datetime
 
 try:
@@ -33,7 +34,7 @@ class Utilities:
         """
         :return: returns the current date and time
         """
-        t = datetime.now().strftime("%m/%d/%Y %H:%M:%S")
+        t = datetime.now(pytz.timezone('US/Eastern')).strftime("%m/%d/%Y %H:%M:%S")
         print(f"{t} - {message}")
 
     @staticmethod
