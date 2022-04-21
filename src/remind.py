@@ -8,7 +8,7 @@ from datetime import datetime, timedelta, timezone
 from utilities import Utilities
 
 date_format = '%Y-%m-%dT%H:%M:%S'
-human_date_format = '%m/%d/%Y @ %I:%M:%S%p'
+human_date_format = '%m/%d/%Y @ %I:%M%p'
 
 
 def parse_time(time):
