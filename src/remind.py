@@ -36,6 +36,8 @@ def add_time_to_date(date, seconds):
 
 def has_datetime_passed(planned_execution_date):
     current_datetime = datetime.now(pytz.timezone('US/Eastern'))
+    Utilities.log(f"has_datetime_passed() - current_datetime: {current_datetime}")
+    Utilities.log(f"has_datetime_passed() - planned_execution_date: {planned_execution_date}")
     if type(planned_execution_date) is str:
         planned_execution_date = datetime.strptime(planned_execution_date, date_format).astimezone(pytz.timezone('US/Eastern'))
     if planned_execution_date > current_datetime:
