@@ -1,5 +1,7 @@
 FROM python:3.10.4-slim-buster
 RUN useradd --create-home groupme
+RUN rm -f /etc/localtime
+RUN ln -s /usr/share/zoneinfo/America/New_York /etc/localtime
 USER groupme
 WORKDIR /home/groupme
 COPY requirements.txt .
