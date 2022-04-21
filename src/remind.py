@@ -101,9 +101,14 @@ class Remind:
         for reminder in self.reminders['reminders']:
             date = reminder['execution_time']
             if type(date) is str:
-                date = datetime.strptime(date, date_format).astimezone(pytz.timezone('US/Eastern'))
+                Utilities.log('date obj is a string')
+                date = datetime.strptime(date, date_format)
+                Utilities.log(f"date timezone before conversion: {date.tzinfo}")
+                date.astimezone(pytz.timezone('US/Eastern'))
             else:
+                Utilities.log(f"date timezone before conversion: {date.tzinfo}")
                 date = date.astimezone(pytz.timezone('US/Eastern'))
+            Utilities.log(f"date timezone after conversion: {date.tzinfo}")
             date = date.strftime(human_date_format)
             message = f"{message}\nCreated by: {reminder['name']}\nReminder date: {date}\nReminder message: {reminder['message']}\n"
         if message == '':
@@ -160,4 +165,4 @@ class Remind:
         self.save_reminders()
         execution_time = (created_at + timedelta(seconds=seconds)).astimezone(pytz.timezone('US/Eastern')).strftime(human_date_format)
         self.create_timer(message, user_id, user.name, seconds, channel_id)
-        return f"Created reminder for {user.name} to go off at {execution_time} that says {message}"
+        return f"Created reminder for {user.name} to go off at {execution_time} that says `{message}`"
