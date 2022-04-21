@@ -38,6 +38,8 @@ def has_datetime_passed(planned_execution_date):
     current_datetime = datetime.now(pytz.timezone('US/Eastern'))
     if type(planned_execution_date) is str:
         planned_execution_date = datetime.strptime(planned_execution_date, date_format)
+    Utilities.log(f"has_datetime_passed() - current_datetime: ({type(current_datetime)}) {current_datetime}")
+    Utilities.log(f"has_datetime_passed() - planned_execution_date: ({type(planned_execution_date)}) {planned_execution_date}")
     if planned_execution_date > current_datetime:
         return {'result': False, 'seconds_until_execution': (planned_execution_date - current_datetime).total_seconds()}
     return {'result': True, 'seconds_until_execution': -1}
