@@ -1,4 +1,4 @@
-FROM python:3.10.3-slim-buster
+FROM python:3.10.4-slim-buster
 RUN useradd --create-home groupme
 USER groupme
 WORKDIR /home/groupme
