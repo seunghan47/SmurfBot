@@ -65,7 +65,7 @@ class Tags:
         match command:
             case 'create':
                 name = message[0]
-                content = {'message': ' '.join(message[2: -1]), 'attachment': parameters['attachment']}
+                content = {'message': ' '.join(message[1: -1]), 'attachment': parameters['attachment']}
                 owner = parameters['author_id']
                 Utilities.log(f"parse_commands() - command: {command}, message: {message}, name: {name}, content:{content}, owner: {owner}")
                 tag_result = self.create_tag(name, content, owner)
