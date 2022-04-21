@@ -101,13 +101,12 @@ class Remind:
         for reminder in self.reminders['reminders']:
             date = reminder['execution_time']
             if type(date) is str:
-                Utilities.log('date obj is a string')
+                Utilities.log('date is a string')
                 date = datetime.strptime(date, date_format)
-                Utilities.log(f"date timezone before conversion: {date.tzinfo}")
-                date.astimezone(pytz.timezone('US/Eastern'))
-            else:
-                Utilities.log(f"date timezone before conversion: {date.tzinfo}")
-                date = date.astimezone(pytz.timezone('US/Eastern'))
+
+            date = datetime.astimezone(timezone.utc)
+            Utilities.log(f"date timezone before conversion: {date.tzinfo}")
+            date = date.astimezone(pytz.timezone('US/Eastern'))
             Utilities.log(f"date timezone after conversion: {date.tzinfo}")
             date = date.strftime(human_date_format)
             message = f"{message}\nCreated by: {reminder['name']}\nReminder date: {date}\nReminder message: {reminder['message']}\n"
