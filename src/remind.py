@@ -1,5 +1,6 @@
 import asyncio
 import json
+import pytz
 import os
 
 from atomicwrites import atomic_write
@@ -43,6 +44,7 @@ def has_datetime_passed(planned_execution_date):
         Utilities.log(f"has_datetime_passed() - seconds_until_execution: {(planned_execution_date - current_datetime)}")
         Utilities.log(f"has_datetime_passed() - seconds_until_execution.total_seconds(): {(planned_execution_date - current_datetime).total_seconds()}")
         return {'result': False, 'seconds_until_execution': (planned_execution_date - current_datetime).total_seconds()}
+    Utilities.log(f"has_datetime_passed() - {planned_execution_date} has passed")
     return {'result': True, 'seconds_until_execution': -1}
 
 
@@ -97,7 +99,13 @@ class Remind:
         self.clean_reminders()
         message = ''
         for reminder in self.reminders['reminders']:
-            message = f"{message}\nCreated by: {reminder['name']}\nReminder date: {reminder['execution_time']}\nReminder message: {reminder['message']}\n"
+            date = reminder['execution_time']
+            if type(date) is str:
+                date = datetime.strptime(date, date_format).astimezone(pytz.timezone('US/Eastern'))
+            else:
+                date = date.astimezone(pytz.timezone('US/Eastern'))
+            date = date.strftime(human_date_format)
+            message = f"{message}\nCreated by: {reminder['name']}\nReminder date: {date}\nReminder message: {reminder['message']}\n"
         if message == '':
             return 'No active reminds were found'
         return message
@@ -145,10 +153,11 @@ class Remind:
             'message': message,
             'created_at': created_at.strftime(date_format),
             'execution_time': add_time_to_date(created_at, seconds).strftime(date_format),
+            'timezone': 'utc',
             'guild_id': guild_id,
             'channel_id': channel_id
         })
         self.save_reminders()
-        execution_time = (created_at + timedelta(seconds=seconds)).strftime(human_date_format)
+        execution_time = (created_at + timedelta(seconds=seconds)).astimezone(pytz.timezone('US/Eastern')).strftime(human_date_format)
         self.create_timer(message, user_id, user.name, seconds, channel_id)
-        return f"Created reminder for {user.name} to go off at {execution_time}"
+        return f"Created reminder for {user.name} to go off at {execution_time} that says {message}"
