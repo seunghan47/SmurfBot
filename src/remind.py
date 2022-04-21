@@ -104,7 +104,7 @@ class Remind:
                 Utilities.log('date is a string')
                 date = datetime.strptime(date, date_format)
 
-            date = datetime.astimezone(timezone.utc)
+            date = date.astimezone(timezone.utc)
             Utilities.log(f"date timezone before conversion: {date.tzinfo}")
             date = date.astimezone(pytz.timezone('US/Eastern'))
             Utilities.log(f"date timezone after conversion: {date.tzinfo}")
