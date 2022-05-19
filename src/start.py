@@ -110,7 +110,8 @@ async def on_message(message: discord.Message):
 
             command = command[0]
             result = await valid_commands[command](parameters)
-            if len(command) == 2 and command[0] == 'tag' and command[1] == 'frfr':
+            if parameters['command'] == 'tag' and parameters['message'][0] == 'frfr':
+                Utilities.log(f"attempting to delete {message.content}")
                 await message.delete()
             await message.channel.send(result)
 
