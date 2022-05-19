@@ -90,7 +90,7 @@ async def on_ready():
 
 
 @client.event
-async def on_message(message):
+async def on_message(message: discord.Message):
     if message.author == client.user:
         return
 
@@ -110,6 +110,8 @@ async def on_message(message):
 
             command = command[0]
             result = await valid_commands[command](parameters)
+            if len(command) == 2 and command[0] == 'tag' and command[1] == 'frfr':
+                await message.delete()
             await message.channel.send(result)
 
 
