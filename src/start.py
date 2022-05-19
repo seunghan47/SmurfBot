@@ -111,8 +111,14 @@ async def on_message(message: discord.Message):
             command = command[0]
             result = await valid_commands[command](parameters)
             if parameters['command'] == 'tag' and parameters['message'][0] == 'frfr':
-                Utilities.log(f"attempting to delete {message.content}")
-                await message.delete()
+                try:
+                    await message.delete()
+                except discord.Forbidden:
+                    Utilities.log(f"{message.guild.name}: bot does not have permissions to delete messages in {message.channel.name}")
+                except discord.NotFound:
+                    Utilities.log(f"{message.guild.name}: message has already been deleted")
+                except discord.HTTPException as e:
+                    Utilities.log(f"{message.guild.name}: HTTPException -> problem deleting message -> {e}")
             await message.channel.send(result)
 
 
