@@ -110,6 +110,7 @@ async def on_message(message: discord.Message):
 
             command = command[0]
             result = await valid_commands[command](parameters)
+            '''
             if parameters['command'] == 'tag' and parameters['message'][0] == 'frfr':
                 try:
                     await message.delete()
@@ -119,6 +120,7 @@ async def on_message(message: discord.Message):
                     Utilities.log(f"{message.guild.name}: message has already been deleted")
                 except discord.HTTPException as e:
                     Utilities.log(f"{message.guild.name}: HTTPException -> problem deleting message -> {e}")
+            '''
             await message.channel.send(result)
 
 
