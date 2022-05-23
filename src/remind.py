@@ -12,19 +12,23 @@ human_date_format = '%m/%d/%Y @ %I:%M%p'
 
 
 def parse_time(time):
-    unit = time[-1]
-    amount = int(time[:-1])
-    match unit:
-        case 's':
-            pass
-        case 'm':
-            amount = amount * 60
-        case 'h':
-            amount = amount * 60 * 60
-        case 'd':
-            amount = amount * 60 * 60 * 24
-        case _:
-            amount = None
+    try:
+        unit = time[-1]
+        amount = int(time[:-1])
+        match unit:
+            case 's':
+                pass
+            case 'm':
+                amount = amount * 60
+            case 'h':
+                amount = amount * 60 * 60
+            case 'd':
+                amount = amount * 60 * 60 * 24
+            case _:
+                amount = None
+    except Exception as e:
+        Utilities.log(f"remind (parse_time) exception: {e}")
+        amount = None
     return amount
 
 
