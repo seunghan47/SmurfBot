@@ -43,6 +43,8 @@ def parse_remind_commands(parameters):
     fetch_user_func = parameters['fetch_user_func']
     created_at = None  # can't convert the time given from discord to EST so I will just use datetime.now()
     user = parameters['author_id']
+    if len(parameters['message'] < 3):
+        time = "help"
     return r.create_reminder(time, message, user, created_at, fetch_user_func, guild_id, channel_id)
 
 

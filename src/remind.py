@@ -138,7 +138,7 @@ class Remind:
         match seconds:
             case 'help':
                 return 'Format: $remind [amount of time] [message]. Example: $remind 1h check laundry\nSupport units: '\
-                       's (seconds), m (minutes), h (hours), or d (days). '
+                       's (seconds), m (minutes), h (hours), or d (days).'
             case 'list':
                 return self.list_reminders()
             case _:
