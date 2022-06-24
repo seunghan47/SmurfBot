@@ -149,6 +149,8 @@ class Remind:
                 seconds = parse_time(seconds)
         if seconds is None:
             return f"Unsupported unit of time. Please use s (seconds), m (minutes), h (hours), or d (days)"
+        if seconds > 31557600:
+            return f"Why are you using this feature for a reminder that far in the future?"
         message = " ".join(message)
         created_at = datetime.now(timezone.utc)
         self.reminders['reminders'].append({
