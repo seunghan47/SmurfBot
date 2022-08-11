@@ -13,7 +13,7 @@ human_date_format = '%m/%d/%Y @ %I:%M%p'
 
 def parse_time(time):
     try:
-        unit = time[-1]
+        unit = time[-1].lower()
         amount = int(time[:-1])
         match unit:
             case 's':
