@@ -8,7 +8,7 @@ from remind import Remind
 from tags import Tags
 from utilities import Utilities
 
-client = discord.Client()
+client = discord.Client(intents=discord.Intents.all())
 ult = Utilities()
 BOT_PATH = os.path.dirname(os.path.realpath(__file__))
 delim = '$'
