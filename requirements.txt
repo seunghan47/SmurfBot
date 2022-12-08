@@ -1,4 +1,4 @@
-discord.py==1.7.3
-atomicwrites==1.4.0
-google-api-python-client==2.42.0
-pytz==2022.1
+discord.py==2.1.0
+atomicwrites==1.4.1
+google-api-python-client==2.68.0
+pytz==2022.6
