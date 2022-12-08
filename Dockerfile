@@ -1,4 +1,4 @@
-FROM python:3.10.4-slim-buster
+FROM python:3.11.0-slim-buster
 RUN useradd --create-home groupme
 RUN rm -f /etc/localtime
 RUN ln -s /usr/share/zoneinfo/America/New_York /etc/localtime
