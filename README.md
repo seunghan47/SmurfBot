@@ -1,7 +1,7 @@
 # SmurfBot
 This is a bot I'm working on for a small discord group I'm in. This is something I'll work on in my spare time.
 This was originally for a groupme chat, but we transitioned to discord.
-Nothing but just a fun little side project for when I'm bored.
+Nothing but just a fun little side project for when I'm bored. hi
 
 ## Libraries used
 [Discord.py](https://discordpy.readthedocs.io/en/stable/#)
